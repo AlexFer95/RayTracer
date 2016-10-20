@@ -2,7 +2,7 @@
 #define VECTOR_HPP
 
 #include "Punto.hpp"
-#include <math.h>
+#include <cmath>
 
 class Punto;
 
