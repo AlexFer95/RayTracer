@@ -65,9 +65,8 @@ class Esfera : public Objeto{
 		float radio;
 		
 		//Coeficientes [0,1] por el que multiplicar la intensidad
-		float coeficienteR;
-		float coeficienteG;
-		float coeficienteB;
+		float kd[3];
+        float ks;
 		
 		//Datos invariates a calcular
 		float cc;
@@ -83,7 +82,8 @@ class Esfera : public Objeto{
 		
 		//Getters
 		float getRadio();
-		float getCoeficienteR();
+		float* getKd();
+        float getKs();
 		float getCoeficienteG();
 		float getCoeficienteB();
 		

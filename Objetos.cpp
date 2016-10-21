@@ -104,9 +104,10 @@ Esfera::Esfera(Punto p, float r, float cr, float cg, float cb){
 	vPosicion = Vector::getDireccion(&o,&origen);
 	radio = r;
 	cc = Vector::pEscalar(&vPosicion,&vPosicion);
-	coeficienteR = cr;
-	coeficienteG = cg;
-	coeficienteB = cb;
+	kd[0] = cr;
+    kd[1] = cg;
+    kd[2] = cb;
+	ks = cg;
 }
 
 //Destructor
@@ -118,16 +119,12 @@ float Esfera::getRadio(){
 	return radio;
 }
 
-float Esfera::getCoeficienteR(){
-	return coeficienteR;
+float* Esfera::getKd(){
+	return kd;
 }
 
-float Esfera::getCoeficienteG(){
-	return coeficienteG;
-}
-
-float Esfera::getCoeficienteB(){
-	return coeficienteB;
+float Esfera::getKs(){
+	return ks;
 }
 		
 //Calcula la distancia de interseccion del rayo con la esfera

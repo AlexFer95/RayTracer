@@ -88,10 +88,7 @@ float Vector::pEscalar(Vector* v1, Vector* v2){
 		return 0;
 	}
 	else{
-		float cos = (v1->getX() * v2->getX() +  v1->getY() * v2->getY() + v1->getZ() * v2->getZ())/
-					 (sqrt( pow(v1->getX(), 2) + pow(v1->getY(), 2) + pow(v1->getZ(), 2))*
-					  sqrt( pow(v2->getX(), 2) + pow(v2->getY(), 2) + pow(v2->getZ(), 2)));
-		return m1 * m2 * cos;
+		return m1 * m2 * cosenoVector(v1,v2);
 	}
 }
 
@@ -101,4 +98,10 @@ Vector Vector::pVectorial(Vector* v1, Vector* v2){
 		   -(v1->getX() * v2->getZ() - v1->getZ() * v2->getX()),
 			(v1->getX() * v2->getY() - v1->getY() * v2->getX()));
 	return v;
+}
+
+float Vector::cosenoVector(Vector* v1, Vector* v2){
+    return (v1->getX() * v2->getX() +  v1->getY() * v2->getY() + v1->getZ() * v2->getZ())/
+           (sqrt( pow(v1->getX(), 2) + pow(v1->getY(), 2) + pow(v1->getZ(), 2))*
+            sqrt( pow(v2->getX(), 2) + pow(v2->getY(), 2) + pow(v2->getZ(), 2)));
 }

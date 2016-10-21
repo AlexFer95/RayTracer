@@ -51,6 +51,9 @@ class Vector{
 		static float pEscalar(Vector* v1, Vector* v2);
 		//Devuelve el producto vectorial v1 x v2
 		static Vector pVectorial(Vector* v1, Vector* v2);
+        //Devuelve el coseno entre dos vectores
+        static float cosenoVector(Vector* v1, Vector* v2);
+
 };
 
 #endif

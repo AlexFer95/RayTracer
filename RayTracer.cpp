@@ -55,7 +55,10 @@ float lanzar_secundarios(Punto origen, FuenteLuz* lista_luces[], int num_luces, 
         }
 
         if(mas_cercana==-1){ // No hay interseccion -> LLega la luz directamente
-            float int_relativa = lista_luces[i]->getEnergia()-(dist_acum + distancia);
+            float int_relativa = lista_luces[i]->getEnergia()/((dist_acum + distancia)*(dist_acum + distancia));
+            Punto centro_ultima = lista_esferas[ultima]->getOrigen();
+            Vector centro_origen = Vector::getDireccion(&centro_ultima,&origen);
+            int_relativa = int_relativa * Vector::cosenoVector(&d,&centro_origen);
             if(int_relativa>0.0){ // Si llega suficiente luz
                 intensidad = intensidad + int_relativa;
             }
@@ -90,21 +93,21 @@ int main(){
     Matriz camara(Vector(1,0,0),Vector(0,1,0),Vector(0,0,1),Punto(ANCHO/2,ALTO/2,0));
 
     //Definir fuentes de luz
-    FuenteLuz f0(Punto(camara.getPref()->getX()-300,camara.getPref()->getY(),DIST_PANTALLA*2),700);
-    //FuenteLuz f1(Punto(400,600,500),500);
-    int num_luces = 1;
+    FuenteLuz f0(Punto(camara.getPref()->getX()-100,camara.getPref()->getY(),DIST_PANTALLA*4),70000000);
+    FuenteLuz f1(Punto(camara.getPref()->getX()-350,camara.getPref()->getY(),DIST_PANTALLA*1),70000000);
+    int num_luces = 2;
     float luz_total = 0.0;
-    FuenteLuz* lista_luces[] = { &f0 };
+    FuenteLuz* lista_luces[] = { &f0, &f1 };
     for(int i=0 ; i<num_luces ; i++){
         luz_total = luz_total + lista_luces[i]->getEnergia();
     }
 
     //Definir objetos de la escena
-    Esfera e0(Punto(camara.getPref()->getX()-150,camara.getPref()->getY(),DIST_PANTALLA*2),100,1.0,1.0,0.0);
-    Esfera e1(Punto(camara.getPref()->getX(),camara.getPref()->getY(),DIST_PANTALLA*2),100,0.0,1.0,0.0);
-    Esfera e2(Punto(camara.getPref()->getX()+150,camara.getPref()->getY(),DIST_PANTALLA*2),100,0.0,0.0,1.0);
-    int num_esferas = 3;
-    Esfera* lista_esferas[] = { &e0, &e1, &e2 };
+    Esfera e0(Punto(camara.getPref()->getX()+250,camara.getPref()->getY(),DIST_PANTALLA*3),100,100,100,0.0);
+    Esfera e1(Punto(camara.getPref()->getX()-100,camara.getPref()->getY(),DIST_PANTALLA*2),100,0.0,100,0.0);
+    //Esfera e2(Punto(camara.getPref()->getX(),camara.getPref()->getY(),DIST_PANTALLA*2),100,0.0,0.0,100);
+    int num_esferas = 2;
+    Esfera* lista_esferas[] = { &e0, &e1 };
 
     //Creamos el fichero en el que guardar la vision de la escena
     ofstream fs("Prueba.ppm");
@@ -152,14 +155,11 @@ int main(){
 
                 float intensidad = lanzar_secundarios(sig_origen,lista_luces,num_luces,lista_esferas,num_esferas,0,0.0,mas_cercana);
 
-                //El color debe tener un valor entre 0 y 240, regla de tres...
-                int color = (int) (intensidad*(MAX_COLOR-MIN_COLOR)/luz_total);
-
                 for(int k=0 ; k<num_esferas ; k++){
                     if(mas_cercana==k){
-                        fs << (MIN_COLOR+color)*lista_esferas[k]->getCoeficienteR() << " "
-                           << (MIN_COLOR+color)*lista_esferas[k]->getCoeficienteG() << " "
-                           << (MIN_COLOR+color)*lista_esferas[k]->getCoeficienteB() << "  ";
+                        fs << /*lista_esferas[k]->getKd()[0]/3.1416*/intensidad << " "
+                           << /*lista_esferas[k]->getKd()[1]/3.1416*/intensidad << " "
+                           << /*lista_esferas[k]->getKd()[2]/3.1416*/intensidad << "  ";
                     }
                 }
             }
