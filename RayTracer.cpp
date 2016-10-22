@@ -6,20 +6,25 @@
 #include "Matriz.hpp"
 #include "Objetos.hpp"
 
-//Numero maximo de rebotes directos
-const int MAX_REBOTES = 4;
-//Distancia minima del rayo rebotado
-const float EPSILON = 0.5;
-//Ancho y alto del plano pantalla (cuadrado)
-const float ANCHO = 400;
-const float ALTO = ANCHO;
-float DIST_PANTALLA;
-// Unidades/Pixel
-const float TAM_PIXEL = 1.0;
-//Color maximo permitido en la imagen
-const int MAX_COLOR = 255;
-
 using namespace std;
+
+//Prototipos de las funciones
+float lanzar_rayos_sombra(Punto origen, Vector* normal, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, float dist_acum);
+void lanzar_rayo_reflejado(Rayo* r, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, float dist_acum, int rebotes, float* intensidad);
+void lanzar_secundarios(Punto* previo, Punto interseccion, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, float dist_acum, int ultima, int rebotes, float* intensidad);
+
+
+
+const int MAX_REBOTES = 4;   //Numero maximo de rebotes directos
+const float EPSILON = 0.5;   //Distancia minima que debe recorrer el rayo
+const float ANCHO = 400;     //Ancho del plano pantalla (cuadrado)
+const float ALTO = ANCHO;    //Alto del plano pantalla (cuadrado)
+float DIST_PANTALLA;         //Distancia entre la camara y el plano
+const float TAM_PIXEL = 1.0; //Unidades/Pixel
+const int MAX_COLOR = 255;   //Color maximo permitido en la imagen
+
+
+
 
 /**float lanzar_secundarios(Punto origen, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, int rebotes, float dist_acum, int ultima){
 
@@ -119,33 +124,73 @@ float lanzar_rayos_sombra(Punto origen, Vector* normal, FuenteLuz* lista_luces[]
 }
 
 //Lanza los rayos refractados y guarda en luz los valores obtenidos
-void lanzar_rayo_refractado(Punto origen, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, int rebotes, float dist_acum, int ultima, float* luz){
+void lanzar_rayo_reflejado(Rayo* r, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, float dist_acum, int rebotes, float* intensidad){
 
-    //Valores para probar que funciona...
-    luz[0] = 255;
-    luz[1] = 255;
-    luz[2] = 255;
+    //Se calculan las intersecciones con las esferas
+    int mas_cercana = -1;           //Indice de la esfera mas cercana
+    float punto_mas_cercano = INFINITY; //Distancia a la que se encuentra el punto de interseccion
 
+    for(int j=0 ; j<num_esferas ; j++){
+        float soluciones[2];
+        lista_esferas[j]->intersectar(r,soluciones);
 
-    //Calcular rayo refractado
+        if(isfinite(soluciones[0]) && soluciones[0]>EPSILON && soluciones[0]<punto_mas_cercano){
+            mas_cercana=j;
+            punto_mas_cercano=soluciones[0];
+        }
+        if(isfinite(soluciones[1]) && soluciones[1]>EPSILON && soluciones[1]<punto_mas_cercano) {
+            mas_cercana = j;
+            punto_mas_cercano = soluciones[1];
+        }
+    }
 
-    //luz[x] = luz[x] en este punto + lanzar_rayo_refractado(siguiente punto, rebote)???
+    if(mas_cercana!=-1){ // Hay alguna interseccion con las esferas
+        if(rebotes<MAX_REBOTES){
+            //Punto de la nueva interseccion
+            Vector direccion_rayo = r->getDireccion();
+            Punto origen_rayo = r->getOrigen();
+            Vector desplazamiento = Vector::productoEscalar(&direccion_rayo,punto_mas_cercano);
+            Punto sig_origen = Punto::desplazar(&origen_rayo,&desplazamiento);
+            lanzar_secundarios(&origen_rayo, sig_origen, lista_luces, num_luces, lista_esferas, num_esferas, dist_acum+desplazamiento.modulo(), mas_cercana, rebotes+1, intensidad);
+        }
+    }
 }
 
 
 //Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
-void lanzar_secundarios(Punto origen, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, float dist_acum, int ultima, float* luz){
+void lanzar_secundarios(Punto* previo, Punto interseccion, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, float dist_acum, int ultima, int rebotes, float* intensidad){
 
-    lanzar_rayo_refractado(origen, lista_luces, num_luces, lista_esferas, num_esferas, 0, dist_acum, ultima, luz);
+    Punto centro_ultima = lista_esferas[ultima]->getOrigen();
+    Vector normal = Vector::getDireccion(&centro_ultima,&interseccion);
+    normal.normalizar();
+
+    //Calculo del rayo reflejado mediante simetria
+    Vector rayo_incidente = Vector::getDireccion(previo,&interseccion);
+    float coseno = Vector::cosenoVector(&rayo_incidente,&normal);
+    Vector rayo_proyeccion = Vector::productoEscalar(&normal, rayo_incidente.modulo()*coseno);
+    Punto origen_proyeccion = Punto::desplazar(&interseccion, &rayo_proyeccion);
+    Vector origen_proyeccion_normal = Vector::getDireccion(previo, &origen_proyeccion);
+    origen_proyeccion_normal = Vector::productoEscalar(&origen_proyeccion_normal,2.0);
+    Punto reflejo = Punto::desplazar(previo, &origen_proyeccion_normal);
+    Vector vector_reflejado = Vector::getDireccion(&interseccion, &reflejo);
+    vector_reflejado.normalizar();
+    Rayo rayo_saliente(interseccion,vector_reflejado);
+    //Calculo de fr
+    float fr[3] = { 0.0, 0.0, 0.0 };
+    float ks = lista_esferas[ultima]->getKs()*((2+5)/(2*3.1416))*pow(coseno,5); // Alpha = 5 constante
+    fr[0] = lista_esferas[ultima]->getKd()[0]/3.1416 + ks;
+    fr[1] = lista_esferas[ultima]->getKd()[1]/3.1416 + ks;
+    fr[2] = lista_esferas[ultima]->getKd()[2]/3.1416 + ks;
 
     //Calculamos la luz directa
-    Punto centro_ultima = lista_esferas[ultima]->getOrigen();
-    Vector normal = Vector::getDireccion(&centro_ultima,&origen);
-    float directa = lanzar_rayos_sombra(origen, &normal, lista_luces, num_luces, lista_esferas, num_esferas, dist_acum);
+    float directa = lanzar_rayos_sombra(interseccion, &normal, lista_luces, num_luces, lista_esferas, num_esferas, dist_acum);
 
-    luz[0] = luz[0] * directa;
-    luz[1] = luz[1] * directa;
-    luz[2] = luz[2] * directa;
+    //Lanzamos un rayo reflejado
+    lanzar_rayo_reflejado(&rayo_saliente, lista_luces, num_luces, lista_esferas, num_esferas, dist_acum, rebotes, intensidad);
+
+    intensidad[0] = intensidad[0] + fr[0]*directa;
+    intensidad[1] = intensidad[1] + fr[1]*directa;
+    intensidad[2] = intensidad[2] + fr[2]*directa;
 }
 
 int main(){
@@ -159,21 +204,14 @@ int main(){
     Matriz camara(Vector(1,0,0),Vector(0,1,0),Vector(0,0,1),Punto(ANCHO/2,ALTO/2,0));
 
     //Definir fuentes de luz
-    FuenteLuz f0(Punto(camara.getPref()->getX()-100,camara.getPref()->getY(),DIST_PANTALLA*4),700000);
-    FuenteLuz f1(Punto(camara.getPref()->getX()-350,camara.getPref()->getY(),DIST_PANTALLA*1),700000);
-    int num_luces = 2;
-    float luz_total = 0.0;
-    FuenteLuz* lista_luces[] = { &f0, &f1 };
-    for(int i=0 ; i<num_luces ; i++){
-        luz_total = luz_total + lista_luces[i]->getEnergia();
-    }
+    FuenteLuz f0(Punto(camara.getPref()->getX()+500,camara.getPref()->getY(),DIST_PANTALLA*3),70000000);
+    int num_luces = 1;
+    FuenteLuz* lista_luces[] = { &f0 };
 
     //Definir objetos de la escena
-    Esfera e0(Punto(camara.getPref()->getX()+250,camara.getPref()->getY(),DIST_PANTALLA*3),100,100,100,0.0);
-    Esfera e1(Punto(camara.getPref()->getX()-100,camara.getPref()->getY(),DIST_PANTALLA*2),100,0.0,100,0.0);
-    //Esfera e2(Punto(camara.getPref()->getX(),camara.getPref()->getY(),DIST_PANTALLA*2),100,0.0,0.0,100);
-    int num_esferas = 2;
-    Esfera* lista_esferas[] = { &e0, &e1 };
+    Esfera e0(Punto(camara.getPref()->getX(),camara.getPref()->getY(),DIST_PANTALLA*3),DIST_PANTALLA,1000,1000,1000,1000);
+    int num_esferas = 1;
+    Esfera* lista_esferas[] = { &e0 };
 
     //Creamos el fichero en el que guardar la vision de la escena
     ofstream fs("Prueba.ppm");
@@ -218,14 +256,14 @@ int main(){
                 //Se lanzan rayos secundarios
                 Vector desplazamiento = Vector::productoEscalar(&d,punto_mas_cercano);
                 Punto sig_origen = Punto::desplazar(camara.getPref(),&desplazamiento);
-                float luz[3] = { 0.0, 0.0, 0.0 };
-                lanzar_secundarios(sig_origen,lista_luces,num_luces,lista_esferas,num_esferas,0.0,mas_cercana,luz);
+                float intensidad[3] = { 0.0, 0.0, 0.0 };
+                lanzar_secundarios(camara.getPref(),sig_origen,lista_luces,num_luces,lista_esferas,num_esferas,desplazamiento.modulo(),mas_cercana,0, intensidad);
 
                 for(int k=0 ; k<num_esferas ; k++){
                     if(mas_cercana==k){
-                        fs << (int)luz[0] << " "
-                           << (int)luz[1] << " "
-                           << (int)luz[2] << "  ";
+                        fs << (int)intensidad[0] << " "
+                           << (int)intensidad[1] << " "
+                           << (int)intensidad[2] << "  ";
                     }
                 }
             }

@@ -7,6 +7,10 @@ Este fichero es conveniente actualizarlo marcando lo que hacen los últimos camb
 Fecha Descripcion
 Detalles
 
+----------------------------------------------------------------------------------------------------------------------------
+
+22/20/16 Primera versión de la reflexión de rayos => ARREGLAR FALLOS
+
 -----------------------------------------------------------------------------------------------------------------------------
 
 21/10/16 Corregidos errores conceptuales en el lanzamiento de rayos secundarios. Siguiente paso: luz ambiental y reflexion

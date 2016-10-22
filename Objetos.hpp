@@ -76,7 +76,7 @@ class Esfera : public Objeto{
 	public:
 		//Constructores
 		Esfera();
-		Esfera(Punto p, float r, float cr=1.0, float cg=1.0, float cb=1.0);
+		Esfera(Punto p, float r, float cr=1.0, float cg=1.0, float cb=1.0, float cs=1.0);
 		//Destructor
 		~Esfera();
 		

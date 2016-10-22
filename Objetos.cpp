@@ -98,7 +98,7 @@ float Rayo::getDD(){
 Esfera::Esfera(){
 }
 
-Esfera::Esfera(Punto p, float r, float cr, float cg, float cb){
+Esfera::Esfera(Punto p, float r, float cr, float cg, float cb, float cs){
 	origen = p;
 	Punto o(0,0,0);
 	vPosicion = Vector::getDireccion(&o,&origen);
@@ -107,7 +107,7 @@ Esfera::Esfera(Punto p, float r, float cr, float cg, float cb){
 	kd[0] = cr;
     kd[1] = cg;
     kd[2] = cb;
-	ks = cg;
+	ks = cs;
 }
 
 //Destructor
