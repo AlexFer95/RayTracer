@@ -17,7 +17,7 @@ void lanzar_secundarios(Punto previo, Punto interseccion, FuenteLuz* lista_luces
 
 
 const int MAX_REBOTES = 1;   //Numero maximo de rebotes directos
-const float EPSILON = 0.5;   //Distancia minima que debe recorrer el rayo
+const float EPSILON = 0.1;   //Distancia minima que debe recorrer el rayo
 const float ANCHO = 3.4641;     //Ancho del plano pantalla (cuadrado)
 const float ALTO = ANCHO;    //Alto del plano pantalla (cuadrado)
 float DIST_PANTALLA;         //Distancia entre la camara y el plano
@@ -231,10 +231,10 @@ int main() {
 
     //Creamos el fichero en el que guardar la vision de la escena
     ofstream fs("Prueba.ppm");
-    fs << "P3" << endl << ANCHO / TAM_PIXEL << " " << ALTO / TAM_PIXEL << endl << MAX_COLOR << endl;
+    fs << "P3" << endl << ANCHO / TAM_PIXEL +1 << " " << ALTO / TAM_PIXEL + 1 << endl << MAX_COLOR << endl;
 
-    for (double i = ALTO / TAM_PIXEL / 2.0; i > -ALTO / TAM_PIXEL / 2.0; i-TAM_PIXEL) {
-        for (double j = -ANCHO / TAM_PIXEL / 2.0; j < ANCHO / TAM_PIXEL / 2.0; j+TAM_PIXEL) {
+    for (double i = ALTO / 2.0 ; i > -ALTO / 2.0 ; i=i-TAM_PIXEL) {
+        for (double j = -ANCHO / 2.0 ; j < ANCHO / 2.0 ; j=j+TAM_PIXEL) {
 
             // Calculamos la direccion al centro(+TAM_PIXEL/2) pixel correspondiente
             Vector d(TAM_PIXEL / 2 + (float) j, TAM_PIXEL / 2 + (float) i, DIST_PANTALLA);
