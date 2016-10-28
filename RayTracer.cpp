@@ -233,8 +233,8 @@ int main() {
     ofstream fs("Prueba.ppm");
     fs << "P3" << endl << ANCHO / TAM_PIXEL << " " << ALTO / TAM_PIXEL << endl << MAX_COLOR << endl;
 
-    for (double i = ALTO / TAM_PIXEL / 2.0; i > -ALTO / TAM_PIXEL / 2.0; i - TAM_PIXEL) {
-        for (double j = -ANCHO / TAM_PIXEL / 2.0; j < ANCHO / TAM_PIXEL / 2.0; j + TAM_PIXEL) {
+    for (double i = ALTO / TAM_PIXEL / 2.0; i > -ALTO / TAM_PIXEL / 2.0; i-TAM_PIXEL) {
+        for (double j = -ANCHO / TAM_PIXEL / 2.0; j < ANCHO / TAM_PIXEL / 2.0; j+TAM_PIXEL) {
 
             // Calculamos la direccion al centro(+TAM_PIXEL/2) pixel correspondiente
             Vector d(TAM_PIXEL / 2 + (float) j, TAM_PIXEL / 2 + (float) i, DIST_PANTALLA);
