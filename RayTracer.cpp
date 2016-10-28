@@ -18,10 +18,10 @@ void lanzar_secundarios(Punto previo, Punto interseccion, FuenteLuz* lista_luces
 
 const int MAX_REBOTES = 1;   //Numero maximo de rebotes directos
 const float EPSILON = 0.5;   //Distancia minima que debe recorrer el rayo
-const float ANCHO = 400;     //Ancho del plano pantalla (cuadrado)
+const float ANCHO = 3.4641;     //Ancho del plano pantalla (cuadrado)
 const float ALTO = ANCHO;    //Alto del plano pantalla (cuadrado)
 float DIST_PANTALLA;         //Distancia entre la camara y el plano
-const float TAM_PIXEL = 1.0; //Unidades/Pixel
+const float TAM_PIXEL = ANCHO / 400; //Unidades/Pixel
 const int MAX_COLOR = 255;   //Color maximo permitido en la imagen
 
 
@@ -220,12 +220,12 @@ int main() {
     Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO / 2, ALTO / 2, 0));
 
     //Definir fuentes de luz
-    FuenteLuz f0(Punto(ANCHO/2+1000, ANCHO/2, DIST_PANTALLA*3), 9000000000);
+    FuenteLuz f0(Punto(ANCHO/2+1, ANCHO/2, DIST_PANTALLA*1), 9000000000);
     int num_luces = 1;
     FuenteLuz *lista_luces[] = {&f0};
 
     //Definir objetos de la escena
-    Esfera e0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), DIST_PANTALLA*5), 500, 0.5, 0.5, 0.5, 0.8);
+    Esfera e0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), DIST_PANTALLA*5), 5, 0.5, 0.5, 0.5, 0.8);
     int num_esferas = 1;
     Esfera *lista_esferas[] = {&e0};
 
@@ -233,8 +233,8 @@ int main() {
     ofstream fs("Prueba.ppm");
     fs << "P3" << endl << ANCHO / TAM_PIXEL << " " << ALTO / TAM_PIXEL << endl << MAX_COLOR << endl;
 
-    for (double i = ALTO / TAM_PIXEL / 2.0; i > -ALTO / TAM_PIXEL / 2.0; i--) {
-        for (double j = -ANCHO / TAM_PIXEL / 2.0; j < ANCHO / TAM_PIXEL / 2.0; j++) {
+    for (double i = ALTO / TAM_PIXEL / 2.0; i > -ALTO / TAM_PIXEL / 2.0; i - TAM_PIXEL) {
+        for (double j = -ANCHO / TAM_PIXEL / 2.0; j < ANCHO / TAM_PIXEL / 2.0; j + TAM_PIXEL) {
 
             // Calculamos la direccion al centro(+TAM_PIXEL/2) pixel correspondiente
             Vector d(TAM_PIXEL / 2 + (float) j, TAM_PIXEL / 2 + (float) i, DIST_PANTALLA);
