@@ -17,7 +17,7 @@ void lanzar_secundarios(Punto previo, Punto interseccion, FuenteLuz* lista_luces
 
 
 const int MAX_REBOTES = 1;   //Numero maximo de rebotes directos
-const float EPSILON = 0.1;   //Distancia minima que debe recorrer el rayo
+const float EPSILON = 0.5;   //Distancia minima que debe recorrer el rayo
 const float ANCHO = 3.4641;     //Ancho del plano pantalla (cuadrado)
 const float ALTO = ANCHO;    //Alto del plano pantalla (cuadrado)
 float DIST_PANTALLA;         //Distancia entre la camara y el plano
@@ -151,8 +151,40 @@ void lanzar_rayo_reflejado(Rayo* r, FuenteLuz* lista_luces[], int num_luces, Esf
 void lanzar_secundarios(Punto previo, Punto interseccion, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, float dist_acum, int ultima, int rebotes, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&previo, &interseccion);
 
-    for(int i=0 ; i<num_luces ; i++){
+    //Se calcula la normal
+    Punto centro_ultima = lista_esferas[ultima]->getOrigen();
+    Vector normal = Vector::getDireccion(&centro_ultima,&interseccion);
 
+    //Calculo del rayo reflejado mediante simetria
+    /*float coseno = Vector::cosenoVector(&omega_i_normalizado,&normal);
+    Vector rayo_proyeccion = Vector::productoEscalar(&normal, distancia*coseno);
+    Punto origen_proyeccion = Punto::desplazar(&interseccion, &rayo_proyeccion);
+    Vector origen_proyeccion_normal = Vector::getDireccion(&punto_luz, &origen_proyeccion);
+    origen_proyeccion_normal = Vector::productoEscalar(&origen_proyeccion_normal,2.0);
+    Punto reflejo = Punto::desplazar(&punto_luz, &origen_proyeccion_normal);
+    Vector vector_reflejado = Vector::getDireccion(&interseccion, &reflejo);
+    vector_reflejado.normalizar();*/
+    float omega_i_normal = Vector::pEscalar(&rayo_previo,&normal);
+    Vector normal_previo_normal = Vector::productoEscalar(&normal,omega_i_normal);
+    Vector menos_normal_previo_normal = Vector::productoEscalar(&normal_previo_normal,-1);
+    Vector previo_mas_anterior = Vector::sumar(&rayo_previo,&menos_normal_previo_normal);
+    Vector menos_dos_anterior = Vector::productoEscalar(&previo_mas_anterior, -2);
+    Vector omega_r = Vector::sumar(&rayo_previo,&menos_dos_anterior);
+
+    //Calculo de fr
+    float fr[3] = { 0.0, 0.0, 0.0 };
+
+    float cos_theta_r =  Vector::cosenoVector(&normal,&omega_r);
+    if(cos_theta_r<0){
+        cos_theta_r = -cos_theta_r;
+    }
+
+    float ks = lista_esferas[ultima]->getKs()*((2+100)/(2*PI))*pow(cos_theta_r,100); // Alpha = 5 constante
+    fr[0] = lista_esferas[ultima]->getKd()[0]/PI + ks;
+    fr[1] = lista_esferas[ultima]->getKd()[1]/PI + ks;
+    fr[2] = lista_esferas[ultima]->getKd()[2]/PI + ks;
+
+    for(int i=0 ; i<num_luces ; i++){
         //Se calcula el rayo a la fuente de luz
         Punto punto_luz = lista_luces[i]->getOrigen();
         Vector omega_i = Vector::getDireccion(&interseccion, &punto_luz);
@@ -162,41 +194,6 @@ void lanzar_secundarios(Punto previo, Punto interseccion, FuenteLuz* lista_luces
         Rayo rayo_luz(interseccion, omega_i_normalizado);
         //Se lanza el rayo a la luz
         float li = lanzar_rayo_luz(&rayo_luz, lista_luces[i], lista_esferas, num_esferas, dist_acum+distancia);
-
-        //Se calcula la normal
-        Punto centro_ultima = lista_esferas[ultima]->getOrigen();
-        Vector normal = Vector::getDireccion(&centro_ultima,&interseccion);
-
-        //Calculo del rayo reflejado mediante simetria
-        /*float coseno = Vector::cosenoVector(&omega_i_normalizado,&normal);
-        Vector rayo_proyeccion = Vector::productoEscalar(&normal, distancia*coseno);
-        Punto origen_proyeccion = Punto::desplazar(&interseccion, &rayo_proyeccion);
-        Vector origen_proyeccion_normal = Vector::getDireccion(&punto_luz, &origen_proyeccion);
-        origen_proyeccion_normal = Vector::productoEscalar(&origen_proyeccion_normal,2.0);
-        Punto reflejo = Punto::desplazar(&punto_luz, &origen_proyeccion_normal);
-        Vector vector_reflejado = Vector::getDireccion(&interseccion, &reflejo);
-        vector_reflejado.normalizar();*/
-        float omega_i_normal = Vector::pEscalar(&omega_i,&normal);
-        Vector normal_omega_i_normal = Vector::productoEscalar(&normal,omega_i_normal);
-        Vector menos_normal_omega_i_normal = Vector::productoEscalar(&normal_omega_i_normal,-1);
-        Vector omega_i_mas_anterior = Vector::sumar(&omega_i,&menos_normal_omega_i_normal);
-        Vector menos_dos_anterior = Vector::productoEscalar(&omega_i_mas_anterior, -2);
-        Vector omega_r = Vector::sumar(&omega_i,&menos_dos_anterior);
-
-        //Calculo de fr
-        float fr[3] = { 0.0, 0.0, 0.0 };
-
-        float cos_theta_r =  Vector::cosenoVector(&normal,&omega_r);
-        if(cos_theta_r<0){
-            cos_theta_r = -cos_theta_r;
-        }
-
-
-
-        float ks = lista_esferas[ultima]->getKs()*((2+10)/(2*PI))*pow(cos_theta_r,10); // Alpha = 5 constante
-        fr[0] = lista_esferas[ultima]->getKd()[0]/PI + ks;
-        fr[1] = lista_esferas[ultima]->getKd()[1]/PI + ks;
-        fr[2] = lista_esferas[ultima]->getKd()[2]/PI + ks;
 
         float cos_theta_i = Vector::cosenoVector(&normal, &omega_i);
         if(cos_theta_i<0){
@@ -220,7 +217,7 @@ int main() {
     Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO / 2, ALTO / 2, 0));
 
     //Definir fuentes de luz
-    FuenteLuz f0(Punto(ANCHO/2+1, ANCHO/2, DIST_PANTALLA*1), 9000000000);
+    FuenteLuz f0(Punto(ANCHO/2+1, ANCHO/2, DIST_PANTALLA*1), 1000000);
     int num_luces = 1;
     FuenteLuz *lista_luces[] = {&f0};
 
