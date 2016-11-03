@@ -149,11 +149,13 @@ void lanzar_rayo_reflejado(Rayo* r, FuenteLuz* lista_luces[], int num_luces, Esf
 
 //Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
 void lanzar_secundarios(Punto previo, Punto interseccion, FuenteLuz* lista_luces[], int num_luces, Esfera* lista_esferas[], int num_esferas, float dist_acum, int ultima, int rebotes, float* intensidad){
-    Vector rayo_previo = Vector::getDireccion(&previo, &interseccion);
+    Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
+    rayo_previo.normalizar();
 
     //Se calcula la normal
     Punto centro_ultima = lista_esferas[ultima]->getOrigen();
     Vector normal = Vector::getDireccion(&centro_ultima,&interseccion);
+    normal.normalizar();
 
     //Calculo del rayo reflejado mediante simetria
     /*float coseno = Vector::cosenoVector(&omega_i_normalizado,&normal);
@@ -170,24 +172,14 @@ void lanzar_secundarios(Punto previo, Punto interseccion, FuenteLuz* lista_luces
     Vector previo_mas_anterior = Vector::sumar(&rayo_previo,&menos_normal_previo_normal);
     Vector menos_dos_anterior = Vector::productoEscalar(&previo_mas_anterior, -2);
     Vector omega_r = Vector::sumar(&rayo_previo,&menos_dos_anterior);
-
-    //Calculo de fr
-    float fr[3] = { 0.0, 0.0, 0.0 };
-
-    float cos_theta_r =  Vector::cosenoVector(&normal,&omega_r);
-    if(cos_theta_r<0){
-        cos_theta_r = -cos_theta_r;
-    }
-
-    float ks = lista_esferas[ultima]->getKs()*((2+100)/(2*PI))*pow(cos_theta_r,100); // Alpha = 5 constante
-    fr[0] = lista_esferas[ultima]->getKd()[0]/PI + ks;
-    fr[1] = lista_esferas[ultima]->getKd()[1]/PI + ks;
-    fr[2] = lista_esferas[ultima]->getKd()[2]/PI + ks;
+    omega_r.normalizar();
 
     for(int i=0 ; i<num_luces ; i++){
+
         //Se calcula el rayo a la fuente de luz
         Punto punto_luz = lista_luces[i]->getOrigen();
         Vector omega_i = Vector::getDireccion(&interseccion, &punto_luz);
+        omega_i.normalizar();
         Vector omega_i_normalizado = omega_i;
         omega_i_normalizado.normalizar();
         float distancia = omega_i.modulo();
@@ -199,6 +191,19 @@ void lanzar_secundarios(Punto previo, Punto interseccion, FuenteLuz* lista_luces
         if(cos_theta_i<0){
             cos_theta_i = -cos_theta_i;
         }
+
+        //Calculo de fr
+        float fr[3] = { 0.0, 0.0, 0.0 };
+
+        float cos_theta_r =  Vector::cosenoVector(&omega_i,&omega_r);
+        if(cos_theta_r<0){
+            cos_theta_r = 0;
+        }
+
+        float ks = lista_esferas[ultima]->getKs()*((2+100)/(2*PI))*pow(cos_theta_r,100); // Alpha = 5 constante
+        fr[0] = lista_esferas[ultima]->getKd()[0]/PI + ks;
+        fr[1] = lista_esferas[ultima]->getKd()[1]/PI + ks;
+        fr[2] = lista_esferas[ultima]->getKd()[2]/PI + ks;
 
         intensidad[0] = intensidad[0] + fr[0]*li*cos_theta_i;
         intensidad[1] = intensidad[1] + fr[1]*li*cos_theta_i;
@@ -217,12 +222,12 @@ int main() {
     Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO / 2, ALTO / 2, 0));
 
     //Definir fuentes de luz
-    FuenteLuz f0(Punto(ANCHO/2+1, ANCHO/2, DIST_PANTALLA*1), 1000000);
+    FuenteLuz f0(Punto(ANCHO/2, ALTO/2, DIST_PANTALLA*-4), 1000000);
     int num_luces = 1;
     FuenteLuz *lista_luces[] = {&f0};
 
     //Definir objetos de la escena
-    Esfera e0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), DIST_PANTALLA*5), 5, 0.5, 0.5, 0.5, 0.8);
+    Esfera e0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), DIST_PANTALLA*5), 5, 1, 1, 1, 0.1);
     int num_esferas = 1;
     Esfera *lista_esferas[] = {&e0};
 
@@ -274,6 +279,17 @@ int main() {
 
                 for (int k = 0; k < num_esferas; k++) {
                     if (mas_cercana == k) {
+
+                        if(intensidad[0]>255){
+                            intensidad[0]=255;
+                        }
+                        if(intensidad[1]>255){
+                            intensidad[1]=255;
+                        }
+                        if(intensidad[2]>255){
+                            intensidad[2]=255;
+                        }
+
                         fs << (int) intensidad[0] << " "
                            << (int) intensidad[1] << " "
                            << (int) intensidad[2] << "  ";
