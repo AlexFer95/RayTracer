@@ -5,7 +5,8 @@
 #include "Vector.hpp"
 #include "Matriz.hpp"
 #include "Objetos.hpp"
-#include "Raytracer.hpp"
+#include "RayTracer.hpp"
+
 using namespace std;
 
 #define PI 3.14159
