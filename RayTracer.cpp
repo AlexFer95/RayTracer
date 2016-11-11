@@ -35,7 +35,7 @@ Vector calcular_reflejado(Vector* rayo, Vector* normal){
 }
 
 //Calcula la iluminacion directa que llega a un punto(rayos de luz/sombra)
-float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum){
+float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia){
     bool directa = true;                                   //Indice de la esfera mas cercana
 
     //Se calculan las intersecciones con las esferas
@@ -43,16 +43,16 @@ float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum){
         float soluciones[2];
         lista_esferas[j]->intersectar(r, soluciones);
 
-        if (isfinite(soluciones[0]) && soluciones[0]>EPSILON) {
+        if (isfinite(soluciones[0]) && soluciones[0]>EPSILON && soluciones[0]<distancia) {
             directa = false;
         }
-        if (isfinite(soluciones[1]) && soluciones[1]>EPSILON) {
+        if (isfinite(soluciones[1]) && soluciones[1]>EPSILON && soluciones[0]<distancia) {
             directa = false;
         }
     }
 
     if(directa) {
-        float int_relativa = lista_luces[num_luz]->getEnergia() / (dist_acum*dist_acum);
+        float int_relativa = lista_luces[num_luz]->getEnergia() / ((dist_acum+distancia)*(dist_acum+distancia));
         if (int_relativa > 0.0) { // Si llega suficiente luz
             return int_relativa;
         }
@@ -108,7 +108,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float
         Rayo rayo_luz(interseccion, omega_i);
 
         //Se lanza el rayo a la luz
-        float li = lanzar_rayo_luz(&rayo_luz, i, dist_acum+distancia);
+        float li = lanzar_rayo_luz(&rayo_luz, i, dist_acum, distancia);
 
         //Calculamos el valor de la brdf
         float fr[3] = { 0.0, 0.0, 0.0 };
