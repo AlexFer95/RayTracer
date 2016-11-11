@@ -5,13 +5,13 @@
 #include "Vector.hpp"
 #include "Matriz.hpp"
 #include "Objetos.hpp"
-
+#include "Raytracer.hpp"
 using namespace std;
 
 #define PI 3.14159
 #define ALPHA 70
 #define MAX_REBOTES 1
-#define EPSILON 0.1
+#define EPSILON 0.001
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
 const float ANCHO_IMAGEN = 400;
@@ -26,13 +26,16 @@ const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
 Punto origen(0, 0, 0); //Origen del sistema
 Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0)); //camara(matriz)
 //Definir fuentes de luz
-FuenteLuz f0(Punto(ANCHO_PANTALLA/2 +DISTANCIA_PANTALLA, ALTO_PANTALLA/2+DISTANCIA_PANTALLA, 0), 250);
-int num_luces = 1;
-FuenteLuz *lista_luces[] = {&f0};
+FuenteLuz f0(Punto(ANCHO_PANTALLA/2 + DISTANCIA_PANTALLA, ALTO_PANTALLA/2+5*DISTANCIA_PANTALLA, 4*DISTANCIA_PANTALLA), 250);
+FuenteLuz f1(Punto(ANCHO_PANTALLA/2 - 5*DISTANCIA_PANTALLA, ALTO_PANTALLA/2-5*DISTANCIA_PANTALLA, 0), 250);
+int num_luces = 2;
+FuenteLuz *lista_luces[] = {&f0, &f1};
 //Definir objetos de la escena
-Esfera e0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), DISTANCIA_PANTALLA*5), DISTANCIA_PANTALLA, 1, 1, 1, 0.1);
-int num_esferas = 1;
-Esfera *lista_esferas[] = {&e0};
+Esfera e0(Punto(camara.getPref()->getX()+0.15, camara.getPref()->getY(), DISTANCIA_PANTALLA*5), DISTANCIA_PANTALLA, 1, 1, 1, 0.1, Phong);
+Esfera e1(Punto(camara.getPref()->getX()-0.15, camara.getPref()->getY(), DISTANCIA_PANTALLA*5), DISTANCIA_PANTALLA, 1, 1, 1, 0.1, Reflexion);
+
+int num_esferas = 2;
+Esfera *lista_esferas[] = {&e0, &e1};
 
 //FUNCIONES Y METODOS
 //Calcula la luz siguiendo la brdf de phong dados el vector incidente, el reflejado y la esfera con la que se ha intersectado
@@ -84,11 +87,33 @@ float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum){
     }
     return 0.0;
 }
+/**
+ * Devuelve el indice de la esfera de la escena con la que colosiona el rayo
+ * @param r
+ * @return
+ */
+void colisionRayoObjetos(Rayo* r, int* i, float* j){
+    int mas_cercana = -1;           //Indice de la esfera mas cercana
+    float punto_mas_cercano = INFINITY; //Distancia a la que se encuentra el punto de interseccion
 
+    for (int k = 0; k < num_esferas; k++) {
+        float soluciones[2];
+        lista_esferas[k]->intersectar(r, soluciones);
 
+        if (isfinite(soluciones[0]) && soluciones[0] > 0 && soluciones[0] < punto_mas_cercano) {
+            mas_cercana = k;
+            punto_mas_cercano = soluciones[0];
+        }
+        if (isfinite(soluciones[1]) && soluciones[1] > 0 && soluciones[1] < punto_mas_cercano) {
+            mas_cercana = k;
+            punto_mas_cercano = soluciones[1];
+        }
+    }
+    *i = mas_cercana;
+    *j = punto_mas_cercano;
+}
 
-//Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
-void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
+void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
     rayo_previo.normalizar();
 
@@ -122,13 +147,57 @@ void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int u
         if(cos_theta_i<0){
             cos_theta_i = -cos_theta_i;
         }
-
+        if(li>0 & i==1){
+            i = 5;
+        }
         //Se añade la luz al total
         intensidad[0] = intensidad[0] + fr[0]*li*cos_theta_i;
         intensidad[1] = intensidad[1] + fr[1]*li*cos_theta_i;
         intensidad[2] = intensidad[2] + fr[2]*li*cos_theta_i;
     }
 }
+void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
+    Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
+    rayo_previo.normalizar();
+
+    //Se calcula la normal
+    Punto centro_ultima = lista_esferas[ultima]->getOrigen();
+    Vector normal = Vector::getDireccion(&centro_ultima,&interseccion);
+    normal.normalizar();
+
+    //Calculo del rayo reflejado mediante simetria
+    Vector omega_r = calcular_reflejado(&rayo_previo,&normal);
+    omega_r.normalizar();
+
+    Rayo reflejado(interseccion, omega_r);
+    int mas_cercana;           //Indice de la esfera mas cercana
+    float punto_mas_cercano ; //Distancia a la que se encuentra el punto de interseccion
+    colisionRayoObjetos(&reflejado, &mas_cercana, &punto_mas_cercano); // Esfera con la que colisiona el rayo
+
+    if (mas_cercana != -1) { //Si no ha intersectado con nada -> NEGRO
+        //Se lanzan rayos secundarios
+        Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
+        Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
+        lanzar_secundarios(camara.getP(), sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, intensidad);
+    }
+
+    }
+//Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
+void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
+    if(rebotes != 0) {
+        switch (lista_esferas[ultima]->getSuperficie()) {
+            case Phong:
+                fPhong(previo, interseccion, dist_acum, ultima, rebotes, intensidad);
+                break;
+            case Reflexion:
+                fReflexion(previo, interseccion, dist_acum, ultima, rebotes, intensidad);
+                break;
+            case Refraccion:
+                break;
+        }
+    }
+}
+
 
 int main() {
     //Creamos el fichero en el que guardar la vision de la escena
@@ -147,20 +216,7 @@ int main() {
 
             int mas_cercana = -1;           //Indice de la esfera mas cercana
             float punto_mas_cercano = INFINITY; //Distancia a la que se encuentra el punto de interseccion
-
-            for (int k = 0; k < num_esferas; k++) {
-                float soluciones[2];
-                lista_esferas[k]->intersectar(&r, soluciones);
-
-                if (isfinite(soluciones[0]) && soluciones[0] > 0 && soluciones[0] < punto_mas_cercano) {
-                    mas_cercana = k;
-                    punto_mas_cercano = soluciones[0];
-                }
-                if (isfinite(soluciones[1]) && soluciones[1] > 0 && soluciones[1] < punto_mas_cercano) {
-                    mas_cercana = k;
-                    punto_mas_cercano = soluciones[1];
-                }
-            }
+            colisionRayoObjetos(&r, &mas_cercana, &punto_mas_cercano); // Esfera con la que colisiona el rayo
 
             if (mas_cercana == -1) { //Si no ha intersectado con nada -> NEGRO
                 fs << "0 0 0  ";
@@ -169,7 +225,7 @@ int main() {
                 Vector desplazamiento = Vector::productoEscalar(&d, punto_mas_cercano);
                 Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
                 float intensidad[3] = {0.0, 0.0, 0.0};
-                lanzar_secundarios(camara.getP(), sig_origen, desplazamiento.modulo(), mas_cercana, 0, intensidad);
+                lanzar_secundarios(camara.getP(), sig_origen, desplazamiento.modulo(), mas_cercana, 4, intensidad);
 
                 for (int k = 0; k < num_esferas; k++) {
                     if (mas_cercana == k) {

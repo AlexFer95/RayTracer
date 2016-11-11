@@ -5,22 +5,28 @@
 
 #include "Vector.hpp"
 #include "Punto.hpp"
-
+enum{
+	Phong = 0,
+	Reflexion = 1,
+	Refraccion = 2,
+};
 class Objeto{
 	protected:
 		Punto origen;
 		Vector vPosicion;
-		
+		int superficie;
+
 	public:
 		//Constructores
 		Objeto();
 		Objeto(float x, float y, float z);
 		//Destructor
 		~Objeto();
-		
+
 		//Getters
 		Punto getOrigen();
 		Vector getVPosicion();
+		int getSuperficie();
 };
 
 class FuenteLuz : public Objeto{
@@ -76,7 +82,7 @@ class Esfera : public Objeto{
 	public:
 		//Constructores
 		Esfera();
-		Esfera(Punto p, float r, float cr=1.0, float cg=1.0, float cb=1.0, float cs=1.0);
+		Esfera(Punto p, float r, float cr=1.0, float cg=1.0, float cb=1.0, float cs=1.0, int superfice = Phong);
 		//Destructor
 		~Esfera();
 		

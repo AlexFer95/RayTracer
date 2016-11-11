@@ -12,6 +12,7 @@ Objeto::Objeto(float x, float y, float z){
 	origen = Punto(x,y,z);
 	Punto p(0,0,0);
 	vPosicion = Vector::getDireccion(&p,&origen);
+    superficie = Phong;
 }
 
 //Destructor
@@ -25,6 +26,9 @@ Punto Objeto::getOrigen(){
 
 Vector Objeto::getVPosicion(){
 	return vPosicion;
+}
+int Objeto::getSuperficie(){
+    return superficie;
 }
 
 /*****************************************************************************/
@@ -98,7 +102,7 @@ float Rayo::getDD(){
 Esfera::Esfera(){
 }
 
-Esfera::Esfera(Punto p, float r, float cr, float cg, float cb, float cs){
+Esfera::Esfera(Punto p, float r, float cr, float cg, float cb, float cs, int superficie){
 	origen = p;
 	Punto o(0,0,0);
 	vPosicion = Vector::getDireccion(&o,&origen);
@@ -108,6 +112,7 @@ Esfera::Esfera(Punto p, float r, float cr, float cg, float cb, float cs){
     kd[1] = cg;
     kd[2] = cb;
 	ks = cs;
+    this->superficie=superficie;
 }
 
 //Destructor
