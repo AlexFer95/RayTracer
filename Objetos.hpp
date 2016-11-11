@@ -5,16 +5,17 @@
 
 #include "Vector.hpp"
 #include "Punto.hpp"
+
 enum{
 	Phong = 0,
 	Reflexion = 1,
 	Refraccion = 2,
 };
+
 class Objeto{
 	protected:
 		Punto origen;
 		Vector vPosicion;
-		int superficie;
 
 	public:
 		//Constructores
@@ -26,7 +27,6 @@ class Objeto{
 		//Getters
 		Punto getOrigen();
 		Vector getVPosicion();
-		int getSuperficie();
 };
 
 class FuenteLuz : public Objeto{
@@ -73,7 +73,10 @@ class Esfera : public Objeto{
 		//Coeficientes [0,1] por el que multiplicar la intensidad
 		float kd[3];
         float ks;
-		
+
+
+		int superficie;
+
 		//Datos invariates a calcular
 		float cc;
 		float oc;
@@ -90,8 +93,7 @@ class Esfera : public Objeto{
 		float getRadio();
 		float* getKd();
         float getKs();
-		float getCoeficienteG();
-		float getCoeficienteB();
+		int getSuperficie();
 		
 		//Calcula la distancia de interseccion del rayo con la esfera
 		// Guarda en sol[0] la solucion con la raiz positiva o NaN si no existe

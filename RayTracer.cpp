@@ -9,35 +9,6 @@
 
 using namespace std;
 
-#define PI 3.14159
-#define ALPHA 70
-#define MAX_REBOTES 1
-#define EPSILON 0.001
-
-//CONSTANTES DE LA IMAGEN Y LA PANTALLA
-const float ANCHO_IMAGEN = 400;
-const float ALTO_IMAGEN = ANCHO_IMAGEN;
-const float COLOR_IMAGEN = 255;
-const float DISTANCIA_PANTALLA = 0.1;
-const float ANCHO_PANTALLA = 2*tan(30*PI/180)*0.1;
-const float ALTO_PANTALLA = ANCHO_PANTALLA;
-const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
-
-//VARIABLES DEL TRAZADOR
-Punto origen(0, 0, 0); //Origen del sistema
-Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0)); //camara(matriz)
-//Definir fuentes de luz
-FuenteLuz f0(Punto(ANCHO_PANTALLA/2 + DISTANCIA_PANTALLA, ALTO_PANTALLA/2+5*DISTANCIA_PANTALLA, 4*DISTANCIA_PANTALLA), 250);
-FuenteLuz f1(Punto(ANCHO_PANTALLA/2 - 5*DISTANCIA_PANTALLA, ALTO_PANTALLA/2-5*DISTANCIA_PANTALLA, 0), 250);
-int num_luces = 2;
-FuenteLuz *lista_luces[] = {&f0, &f1};
-//Definir objetos de la escena
-Esfera e0(Punto(camara.getPref()->getX()+0.15, camara.getPref()->getY(), DISTANCIA_PANTALLA*5), DISTANCIA_PANTALLA, 1, 1, 1, 0.1, Phong);
-Esfera e1(Punto(camara.getPref()->getX()-0.15, camara.getPref()->getY(), DISTANCIA_PANTALLA*5), DISTANCIA_PANTALLA, 1, 1, 1, 0.1, Reflexion);
-
-int num_esferas = 2;
-Esfera *lista_esferas[] = {&e0, &e1};
-
 //FUNCIONES Y METODOS
 //Calcula la luz siguiendo la brdf de phong dados el vector incidente, el reflejado y la esfera con la que se ha intersectado
 void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
@@ -114,7 +85,7 @@ void colisionRayoObjetos(Rayo* r, int* i, float* j){
     *j = punto_mas_cercano;
 }
 
-void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
+void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
     rayo_previo.normalizar();
 
@@ -178,17 +149,17 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
     if (mas_cercana != -1) { //Si no ha intersectado con nada -> NEGRO
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
-        Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
-        lanzar_secundarios(camara.getP(), sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, intensidad);
+        Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
+        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, intensidad);
     }
+}
 
-    }
 //Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
 void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
     if(rebotes != 0) {
         switch (lista_esferas[ultima]->getSuperficie()) {
             case Phong:
-                fPhong(previo, interseccion, dist_acum, ultima, rebotes, intensidad);
+                fPhong(previo, interseccion, dist_acum, ultima, intensidad);
                 break;
             case Reflexion:
                 fReflexion(previo, interseccion, dist_acum, ultima, rebotes, intensidad);
@@ -226,7 +197,7 @@ int main() {
                 Vector desplazamiento = Vector::productoEscalar(&d, punto_mas_cercano);
                 Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
                 float intensidad[3] = {0.0, 0.0, 0.0};
-                lanzar_secundarios(camara.getP(), sig_origen, desplazamiento.modulo(), mas_cercana, 4, intensidad);
+                lanzar_secundarios(camara.getP(), sig_origen, desplazamiento.modulo(), mas_cercana, MAX_REBOTES, intensidad);
 
                 for (int k = 0; k < num_esferas; k++) {
                     if (mas_cercana == k) {

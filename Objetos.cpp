@@ -12,7 +12,6 @@ Objeto::Objeto(float x, float y, float z){
 	origen = Punto(x,y,z);
 	Punto p(0,0,0);
 	vPosicion = Vector::getDireccion(&p,&origen);
-    superficie = Phong;
 }
 
 //Destructor
@@ -26,9 +25,6 @@ Punto Objeto::getOrigen(){
 
 Vector Objeto::getVPosicion(){
 	return vPosicion;
-}
-int Objeto::getSuperficie(){
-    return superficie;
 }
 
 /*****************************************************************************/
@@ -130,6 +126,10 @@ float* Esfera::getKd(){
 
 float Esfera::getKs(){
 	return ks;
+}
+
+int Esfera::getSuperficie(){
+    return superficie;
 }
 		
 //Calcula la distancia de interseccion del rayo con la esfera
