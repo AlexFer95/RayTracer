@@ -16,7 +16,7 @@
 #define EPSILON 0.001
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
-const float ANCHO_IMAGEN = 400;
+const float ANCHO_IMAGEN = 600;
 const float ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
 const float DISTANCIA_PANTALLA = 0.1;
@@ -28,16 +28,18 @@ const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
 Punto origen(0, 0, 0); //Origen del sistema
 Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0)); //camara(matriz)
 //Definir fuentes de luz
-FuenteLuz f0(Punto(ANCHO_PANTALLA/2 + DISTANCIA_PANTALLA, ALTO_PANTALLA/2+5*DISTANCIA_PANTALLA, 4*DISTANCIA_PANTALLA), 250);
-FuenteLuz f1(Punto(ANCHO_PANTALLA/2 - 5*DISTANCIA_PANTALLA, ALTO_PANTALLA/2-5*DISTANCIA_PANTALLA, 0), 250);
+FuenteLuz f0(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*6, camara.getPref()->getY()+DISTANCIA_PANTALLA*3, DISTANCIA_PANTALLA*10), 1000);
+FuenteLuz f1(Punto(camara.getPref()->getX()-DISTANCIA_PANTALLA*6, camara.getPref()->getY()+DISTANCIA_PANTALLA*3, DISTANCIA_PANTALLA*10), 1000);
 int num_luces = 2;
-FuenteLuz *lista_luces[] = {&f0, &f1};
+FuenteLuz *lista_luces[] = {&f0,&f1};
 //Definir objetos de la escena
-Esfera e0(Punto(camara.getPref()->getX()+0.15, camara.getPref()->getY(), DISTANCIA_PANTALLA*5), DISTANCIA_PANTALLA, 1, 1, 1, 0.1, Phong);
-Esfera e1(Punto(camara.getPref()->getX()-0.15, camara.getPref()->getY(), DISTANCIA_PANTALLA*5), DISTANCIA_PANTALLA, 1, 1, 1, 0.1, Reflexion);
-
-int num_esferas = 2;
-Esfera *lista_esferas[] = {&e0, &e1};
+Esfera e0(Punto(camara.getPref()->getX(), camara.getPref()->getY()-DISTANCIA_PANTALLA*402, DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA*400, 0.3, 1, 1, 0);
+Esfera e1(Punto(camara.getPref()->getX(), camara.getPref()->getY(), DISTANCIA_PANTALLA*414), DISTANCIA_PANTALLA*400, 1, 1, 0.3, 0);
+Esfera e2(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*4, camara.getPref()->getY()-DISTANCIA_PANTALLA*1.5, DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA/2, 1, 0.1, 0.1, 0.1);
+Esfera e3(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA, camara.getPref()->getY()-DISTANCIA_PANTALLA, DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA, 0.1, 1, 0.1, 0.5, Reflexion);
+Esfera e4(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*-4, camara.getPref()->getY(), DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA*2, 0.1, 0.1, 1, 0.9);
+int num_esferas = 5;
+Esfera *lista_esferas[] = {&e0,&e1,&e2,&e3,&e4};
 
 void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr);
 Vector calcular_reflejado(Vector* rayo, Vector* normal);
