@@ -72,11 +72,11 @@ void colisionRayoObjetos(Rayo* r, int* i, float* j){
         float soluciones[2];
         lista_esferas[k]->intersectar(r, soluciones);
 
-        if (isfinite(soluciones[0]) && soluciones[0] > 0 && soluciones[0] < punto_mas_cercano) {
+        if (isfinite(soluciones[0]) && soluciones[0] > 0 && soluciones[0] < punto_mas_cercano && soluciones[0] > EPSILON) {
             mas_cercana = k;
             punto_mas_cercano = soluciones[0];
         }
-        if (isfinite(soluciones[1]) && soluciones[1] > 0 && soluciones[1] < punto_mas_cercano) {
+        if (isfinite(soluciones[1]) && soluciones[1] > 0 && soluciones[1] < punto_mas_cercano && soluciones[1] > EPSILON) {
             mas_cercana = k;
             punto_mas_cercano = soluciones[1];
         }
