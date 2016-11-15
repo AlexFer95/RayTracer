@@ -16,7 +16,7 @@
 #define EPSILON 0.001
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
-const float ANCHO_IMAGEN = 1000;
+const float ANCHO_IMAGEN = 600;
 const float ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
 const float DISTANCIA_PANTALLA = 0.1;

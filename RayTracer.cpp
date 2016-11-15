@@ -33,7 +33,23 @@ Vector calcular_reflejado(Vector* rayo, Vector* normal){
     Vector menos_dos_anterior = Vector::productoEscalar(&previo_mas_anterior, -2);
     return Vector::sumar(rayo,&menos_dos_anterior);
 }
-
+/**
+ * Devuelve el vector reflejado rayo respecto a la normal dados los indices de refraccion n1 y n2
+ * Copiado de un documento de la universidad de Standford
+ */
+Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2){
+    double n = n1/n2;
+    double cosI = - Vector::pEscalar(normal, rayo);
+    double sinT2 = n*n*(1.0 - cosI*cosI);
+    /**if(sinT2 > 1.0){
+        return null;
+    }*/
+    double cosT = sqrt(1.0 - sinT2);
+    Vector v1 = Vector::productoEscalar(rayo,n);
+    Vector v2 = Vector::productoEscalar(normal,(n*cosI - cosT));
+    Vector refractado = Vector::sumar(&v1,&v2);
+    return refractado;
+}
 //Calcula la iluminacion directa que llega a un punto(rayos de luz/sombra)
 float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia){
     bool directa = true;                                   //Indice de la esfera mas cercana
