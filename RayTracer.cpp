@@ -169,7 +169,35 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, intensidad);
     }
 }
+int imp2 = 2;
+void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
+    Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
+    rayo_previo.normalizar();
 
+    //Se calcula la normal
+    Punto centro_ultima = lista_esferas[ultima]->getOrigen();
+    Vector normal = Vector::getDireccion(&centro_ultima,&interseccion);
+
+    if(Vector::cosenoVector(&rayo_previo,&normal)<0){
+        normal =  Vector(-normal.getX(), -normal.getY(), -normal.getZ());
+    }
+    normal.normalizar();
+
+    //Calculo del rayo reflejado mediante simetria
+    Vector omega_r = calcular_refractado(&rayo_previo,&normal, 1, 1.2);
+    omega_r.normalizar();
+    Rayo reflejado(interseccion, omega_r);
+    int mas_cercana;           //Indice de la esfera mas cercana
+    float punto_mas_cercano ; //Distancia a la que se encuentra el punto de interseccion
+    colisionRayoObjetos(&reflejado, &mas_cercana, &punto_mas_cercano); // Esfera con la que colisiona el rayo
+
+    if (mas_cercana != -1) { //Si no ha intersectado con nada -> NEGRO
+        //Se lanzan rayos secundarios
+        Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
+        Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
+        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, intensidad);
+    }
+}
 //Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
 void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
     if(rebotes != 0) {
@@ -181,6 +209,8 @@ void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int u
                 fReflexion(previo, interseccion, dist_acum, ultima, rebotes, intensidad);
                 break;
             case Refraccion:
+
+                fRefraccion(previo, interseccion, dist_acum, ultima, rebotes, intensidad);
                 break;
         }
     }
