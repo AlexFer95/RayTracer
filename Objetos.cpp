@@ -98,7 +98,7 @@ float Rayo::getDD(){
 Esfera::Esfera(){
 }
 
-Esfera::Esfera(Punto p, float r, float cr, float cg, float cb, float cs, int superficie){
+Esfera::Esfera(Punto p, float r, float cr, float cg, float cb, float cs, int superficie, float cocienteRefraccion){
 	origen = p;
 	Punto o(0,0,0);
 	vPosicion = Vector::getDireccion(&o,&origen);
@@ -109,6 +109,7 @@ Esfera::Esfera(Punto p, float r, float cr, float cg, float cb, float cs, int sup
     kd[2] = cb;
 	ks = cs;
     this->superficie=superficie;
+    kr = cocienteRefraccion;
 }
 
 //Destructor
@@ -126,6 +127,9 @@ float* Esfera::getKd(){
 
 float Esfera::getKs(){
 	return ks;
+}
+float Esfera::getKr(){
+    return kr;
 }
 
 int Esfera::getSuperficie(){

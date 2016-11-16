@@ -169,7 +169,6 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, intensidad);
     }
 }
-int imp2 = 2;
 void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
     rayo_previo.normalizar();
@@ -177,14 +176,17 @@ void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, 
     //Se calcula la normal
     Punto centro_ultima = lista_esferas[ultima]->getOrigen();
     Vector normal = Vector::getDireccion(&centro_ultima,&interseccion);
-
+    float refraccionEntrada = 1;
+    float refraccionSalida =  lista_esferas[ultima]->getKr();
     if(Vector::cosenoVector(&rayo_previo,&normal)<0){
         normal =  Vector(-normal.getX(), -normal.getY(), -normal.getZ());
+        refraccionEntrada = refraccionSalida;
+        refraccionSalida = 1;
     }
     normal.normalizar();
 
     //Calculo del rayo reflejado mediante simetria
-    Vector omega_r = calcular_refractado(&rayo_previo,&normal, 1, 1.2);
+    Vector omega_r = calcular_refractado(&rayo_previo,&normal, refraccionEntrada, refraccionSalida);
     omega_r.normalizar();
     Rayo reflejado(interseccion, omega_r);
     int mas_cercana;           //Indice de la esfera mas cercana

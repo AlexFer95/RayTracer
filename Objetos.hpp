@@ -73,7 +73,7 @@ class Esfera : public Objeto{
 		//Coeficientes [0,1] por el que multiplicar la intensidad
 		float kd[3];
         float ks;
-
+        float kr;
 
 		int superficie;
 
@@ -85,7 +85,7 @@ class Esfera : public Objeto{
 	public:
 		//Constructores
 		Esfera();
-		Esfera(Punto p, float r, float cr=1.0, float cg=1.0, float cb=1.0, float cs=1.0, int superfice = Phong);
+		Esfera(Punto p, float r, float cr=1.0, float cg=1.0, float cb=1.0, float cs=1.0, int superfice = Phong, float cocienteRefraccion=1.0);
 		//Destructor
 		~Esfera();
 		
@@ -93,6 +93,7 @@ class Esfera : public Objeto{
 		float getRadio();
 		float* getKd();
         float getKs();
+        float getKr();
 		int getSuperficie();
 		
 		//Calcula la distancia de interseccion del rayo con la esfera
