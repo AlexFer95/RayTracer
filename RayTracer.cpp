@@ -223,9 +223,16 @@ int main() {
     //Creamos el fichero en el que guardar la vision de la escena
     ofstream fs("Prueba.ppm");
     fs << "P3" << endl << ANCHO_IMAGEN << " " << ALTO_IMAGEN << endl << COLOR_IMAGEN << endl;
+    double i=ALTO_PANTALLA/2.0;
+    for (int ind = 0 ; ind<ALTO_IMAGEN ; ind++) {
+        i=i-TAM_PIXEL;
+        double j=-ANCHO_PANTALLA/2.0 ;
+        for (int ind2 = 0; ind2<ANCHO_IMAGEN ; ind2++) {
+            j=j+TAM_PIXEL;
 
-    for (double i=ALTO_PANTALLA/2.0 ; i>-ALTO_PANTALLA/2.0 ; i=i-TAM_PIXEL) {
-        for (double j=-ANCHO_PANTALLA/2.0 ; j<ANCHO_PANTALLA/2.0 ; j=j+TAM_PIXEL) {
+            if(i < ALTO_PANTALLA/2.0 - TAM_PIXEL*200){
+                i=i+0;
+            }
 
             // Calculamos la direccion al centro(+TAM_PIXEL/2) pixel correspondiente
             Vector d(TAM_PIXEL/2 + (float)j, TAM_PIXEL/2 + (float)i, DISTANCIA_PANTALLA);
@@ -264,6 +271,8 @@ int main() {
                            << (int) intensidad[1] << " "
                            << (int) intensidad[2] << "  ";
                     }
+
+                    fs.flush();
                 }
             }
         }
