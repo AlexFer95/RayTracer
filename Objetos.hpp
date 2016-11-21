@@ -6,10 +6,25 @@
 #include "Vector.hpp"
 #include "Punto.hpp"
 
-enum{
+//COLORES
+const float amarillo[3] = { 1.0 , 1.0 , 0.1 };
+const float azul[3] = { 0.1 , 1.0 , 1.0 };
+const float azul2[3] = { 0.1 , 0.1 , 1.0 };
+const float morado[3] = { 1.0 , 0.1 , 1.0 };
+const float negro[3] = { 0.0 , 0.0 , 0.0 };
+const float rojo[3] = { 1.0 , 0.1 , 0.1 };
+
+enum Superficie{
 	Phong = 0,
 	Reflexion = 1,
 	Refraccion = 2,
+};
+
+struct Material{
+	const float* kd;
+	float ks;
+	float kr;
+	Superficie s;
 };
 
 class Objeto{
@@ -70,12 +85,8 @@ class Esfera : public Objeto{
 	private:
 		float radio;
 		
-		//Coeficientes [0,1] por el que multiplicar la intensidad
-		float kd[3];
-        float ks;
-        float kr;
-
-		int superficie;
+		//Propiedades materiales de la esfera
+		struct Material m;
 
 		//Datos invariates a calcular
 		float cc;
@@ -85,13 +96,13 @@ class Esfera : public Objeto{
 	public:
 		//Constructores
 		Esfera();
-		Esfera(Punto p, float r, float cr=1.0, float cg=1.0, float cb=1.0, float cs=1.0, int superfice = Phong, float cocienteRefraccion=1.0);
+		Esfera(Punto p, float r, Material material);
 		//Destructor
 		~Esfera();
 		
 		//Getters
 		float getRadio();
-		float* getKd();
+		const float* getKd();
         float getKs();
         float getKr();
 		int getSuperficie();

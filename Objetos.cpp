@@ -98,18 +98,13 @@ float Rayo::getDD(){
 Esfera::Esfera(){
 }
 
-Esfera::Esfera(Punto p, float r, float cr, float cg, float cb, float cs, int superficie, float cocienteRefraccion){
+Esfera::Esfera(Punto p, float r, Material material){
 	origen = p;
 	Punto o(0,0,0);
 	vPosicion = Vector::getDireccion(&o,&origen);
 	radio = r;
 	cc = Vector::pEscalar(&vPosicion,&vPosicion);
-	kd[0] = cr;
-    kd[1] = cg;
-    kd[2] = cb;
-	ks = cs;
-    this->superficie=superficie;
-    kr = cocienteRefraccion;
+	m = material;
 }
 
 //Destructor
@@ -121,19 +116,19 @@ float Esfera::getRadio(){
 	return radio;
 }
 
-float* Esfera::getKd(){
-	return kd;
+const float* Esfera::getKd(){
+	return m.kd;
 }
 
 float Esfera::getKs(){
-	return ks;
+	return m.ks;
 }
 float Esfera::getKr(){
-    return kr;
+    return m.kr;
 }
 
 int Esfera::getSuperficie(){
-    return superficie;
+    return m.s;
 }
 		
 //Calcula la distancia de interseccion del rayo con la esfera

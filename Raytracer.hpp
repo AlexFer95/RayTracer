@@ -16,7 +16,7 @@
 #define EPSILON 0.001
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
-const float ANCHO_IMAGEN = 400;
+const float ANCHO_IMAGEN = 1000;
 const float ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
 const float DISTANCIA_PANTALLA = 0.1;
@@ -32,16 +32,25 @@ FuenteLuz f0(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*8, camara.getPref
 FuenteLuz f1(Punto(camara.getPref()->getX()-DISTANCIA_PANTALLA*8, camara.getPref()->getY()+DISTANCIA_PANTALLA*4, DISTANCIA_PANTALLA*8), 2000);
 int num_luces = 2;
 FuenteLuz *lista_luces[] = {&f0,&f1};
+
 //Definir objetos de la escena
-Esfera suelo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, 0.1, 1, 1, 0.05);
-Esfera techo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*-1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, 0.1, 1, 1, 0.05);
-Esfera fondo(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*1020), DISTANCIA_PANTALLA*1000, 1, 1, 0.1, 0.05);
-Esfera frente(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*-1010), DISTANCIA_PANTALLA*1000, 1, 1, 0.1, 0.05);
-Esfera izquierda(Punto(camara.getPref()->getX() + DISTANCIA_PANTALLA*-1010, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, 1, 0.1, 1, 0.05);
-Esfera derecha(Punto(camara.getPref()->getX() + DISTANCIA_PANTALLA*1010, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, 1, 0.1, 1, 0.05);
-Esfera e0(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*4, camara.getPref()->getY()-DISTANCIA_PANTALLA*1.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA/2, 1, 0.1, 0.1, 0.1);
-Esfera e1(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA, camara.getPref()->getY()-DISTANCIA_PANTALLA, camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA, 0.1, 1, 0.1, 0.5, Refraccion, 1.54);
-Esfera e2(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*-4, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA*2, 0.1, 0.1, 1, 0.9);
+Material p_azul = { azul , 0.05 , 0.0 , Phong};
+Material p_amar = { amarillo , 0.05 , 0.0 , Phong};
+Material p_mora = { morado , 0.05 , 0.0 , Phong};
+Material p_rojo = { rojo , 0.1 , 0.0 , Phong};
+Material p_azul2 = { azul2 , 0.9 , 0.0 , Phong};
+Material reflex = { negro , 0.0 , 1.0 , Reflexion};
+Material refrac = { negro , 0.0 , 1.0 , Refraccion};
+
+Esfera suelo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
+Esfera techo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*-1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
+Esfera fondo(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*1020), DISTANCIA_PANTALLA*1000, p_amar);
+Esfera frente(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*-1010), DISTANCIA_PANTALLA*1000, p_amar);
+Esfera izquierda(Punto(camara.getPref()->getX() + DISTANCIA_PANTALLA*-1010, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_mora);
+Esfera derecha(Punto(camara.getPref()->getX() + DISTANCIA_PANTALLA*1010, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_mora);
+Esfera e0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA/2, p_rojo);
+Esfera e1(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*4, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA*2, reflex);
+Esfera e2(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*-4, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA*2, refrac);
 int num_esferas = 9;
 Esfera *lista_esferas[] = {&suelo,&techo,&fondo,&frente,&izquierda,&derecha,&e0,&e1,&e2};
 
