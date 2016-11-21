@@ -16,7 +16,7 @@
 #define EPSILON 0.001
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
-const float ANCHO_IMAGEN = 1000;
+const float ANCHO_IMAGEN = 600;
 const float ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
 const float DISTANCIA_PANTALLA = 0.1;
@@ -40,7 +40,7 @@ Material p_mora = { morado , 0.05 , 0.0 , Phong};
 Material p_rojo = { rojo , 0.1 , 0.0 , Phong};
 Material p_azul2 = { azul2 , 0.9 , 0.0 , Phong};
 Material reflex = { negro , 0.0 , 1.0 , Reflexion};
-Material refrac = { negro , 0.0 , 1.0 , Refraccion};
+Material refrac = { negro , 0.0 , 1.54 , Refraccion};
 
 Esfera suelo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
 Esfera techo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*-1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);

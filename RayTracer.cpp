@@ -38,14 +38,15 @@ Vector calcular_reflejado(Vector* rayo, Vector* normal){
  * Copiado de un documento de la universidad de Standford
  */
 Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2){
+    Vector incidente = Vector::productoEscalar(rayo, -1);
     double n = n1/n2;
-    double cosI = - Vector::pEscalar(normal, rayo);
+    double cosI = - Vector::pEscalar(normal, &incidente);
     double sinT2 = n*n*(1.0 - cosI*cosI);
     /**if(sinT2 > 1.0){
         return null;
     }*/
     double cosT = sqrt(1.0 - sinT2);
-    Vector v1 = Vector::productoEscalar(rayo,n);
+    Vector v1 = Vector::productoEscalar(&incidente,n);
     Vector v2 = Vector::productoEscalar(normal,(n*cosI - cosT));
     Vector refractado = Vector::sumar(&v1,&v2);
     return refractado;
