@@ -282,3 +282,19 @@ int main() {
     fs.close();
     return 0;
 }
+
+Matriz coordLocales(Vector normal, Punto posicion){
+    Vector cualquiera = Vector(1,0,0);
+    Vector u = Vector::pVectorial(&normal,&cualquiera);
+    if(u.modulo()==0){
+        cualquiera = Vector(0,1,0);
+        u = Vector::pVectorial(&normal,&cualquiera);
+        if(u.modulo()==0){
+            cualquiera = Vector(0,0,1);
+            u = Vector::pVectorial(&normal,&cualquiera);
+        }
+    }
+    Vector v = Vector::pVectorial(&normal,&u);
+
+    return  Matriz(u, v, normal, posicion);
+}

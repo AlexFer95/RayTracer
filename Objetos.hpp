@@ -5,6 +5,7 @@
 
 #include "Vector.hpp"
 #include "Punto.hpp"
+#include "Matriz.hpp"
 
 //COLORES
 const float amarillo[3] = { 1.0 , 1.0 , 0.1 };
@@ -42,6 +43,7 @@ class Objeto{
 		//Getters
 		Punto getOrigen();
 		Vector getVPosicion();
+        Objeto transformar(Matriz coorLocales);
 };
 
 class FuenteLuz : public Objeto{
@@ -106,6 +108,8 @@ class Esfera : public Objeto{
         float getKs();
         float getKr();
 		int getSuperficie();
+
+        Objeto transformar(Matriz coorLocales);
 		
 		//Calcula la distancia de interseccion del rayo con la esfera
 		// Guarda en sol[0] la solucion con la raiz positiva o NaN si no existe

@@ -2,6 +2,11 @@ FICHERO DE LOG
 Este fichero es conveniente actualizarlo marcando lo que hacen los últimos cambios y los detalles que sean necesarios.
 
 
+COSAS POR HACER:
+Para favorecer la modularidad deberiamos de hacer una función en Objeto que devolviese si un rayo intercepta con el.
+Que cada objeto Esfera, Triangulo... tenga su propia implementación de esta función. Así se podria tener una lista de
+objetos y buscar la interseccion de cada uno sin llenar el codigo de raytracer de switch esfera o triangulo...
+
 ----------------------------------------------------------------------------------------------------------------------------
 
 Fecha Descripcion

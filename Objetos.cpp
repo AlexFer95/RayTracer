@@ -110,7 +110,11 @@ Esfera::Esfera(Punto p, float r, Material material){
 //Destructor
 Esfera::~Esfera(){
 }
-		
+
+Objeto Esfera::transformar(Matriz coorLocales){
+    Punto nuevoOrigen = coorLocales.transformar(&origen);
+    return Esfera(nuevoOrigen, radio, m);
+}
 //Getters
 float Esfera::getRadio(){
 	return radio;
