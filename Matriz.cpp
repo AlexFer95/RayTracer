@@ -9,6 +9,11 @@ Matriz::Matriz (Vector v1, Vector v2, Vector v3, Punto p1){
 	b = v2; //top
 	c = v3; //front
 	p = p1;
+	h[0] = 0;
+	h[1] = 0;
+	h[2] = 0;
+	h[3] = 1;
+
 }
 
 //Destructor
@@ -31,6 +36,13 @@ void Matriz::setC(Vector c1){
 void Matriz::setP(Punto p1){
 	p=p1;
 }
+
+void Matriz::setH(float h0, float h1, float h2, float h3) {
+	h[0] = h0;
+	h[1] = h1;
+	h[2] = h2;
+	h[3] = h3;
+}
 		
 //Getters de los vectores y el punto
 Vector Matriz::getA(){
@@ -47,6 +59,10 @@ Vector Matriz::getC(){
 
 Punto Matriz::getP(){
 	return p;
+}
+
+float* Matriz::getH() {
+	return h;
 }
 
 Vector* Matriz::getAref(){
@@ -66,6 +82,139 @@ Punto* Matriz::getPref(){
 }
 
 //Transformaciones con la matriz
+Matriz Matriz::invertir(){
+
+	double inv[16];
+	inv[0] = b.getY()  * c.getZ() * h[3] -
+			 b.getY()  * h[2] * c.getZ() -
+			 c.getY()  * b.getZ()  * h[3] +
+			 c.getY()  * h[1]  * c.getZ() +
+			 c.getY() * b.getZ()  * h[2] -
+			 c.getY() * h[1]  * c.getZ();
+
+	inv[4] = -b.getX()  * c.getZ() * h[3] +
+			 b.getX()  * h[2] * c.getZ() +
+			 c.getX()  * b.getZ()  * h[3] -
+			 c.getX()  * h[1]  * c.getZ() -
+			 c.getX() * b.getZ()  * h[2] +
+			 c.getX() * h[1]  * c.getZ();
+
+	inv[8] = b.getX()  * c.getY() * h[3] -
+			 b.getX()  * h[2] * c.getY() -
+			 c.getX()  * b.getY() * h[3] +
+			 c.getX()  * h[1] * c.getY() +
+			 c.getX() * b.getY() * h[2] -
+			 c.getX() * h[1] * c.getY();
+
+	inv[12] = -b.getX()  * c.getY() * c.getZ() +
+			  b.getX()  * c.getZ() * c.getY() +
+			  c.getX()  * b.getY() * c.getZ() -
+			  c.getX()  * b.getZ() * c.getY() -
+			  c.getX() * b.getY() * c.getZ() +
+			  c.getX() * b.getZ() * c.getY();
+
+	inv[1] = -a.getY()  * c.getZ() * h[3] +
+			 a.getY()  * h[2] * c.getZ() +
+			 c.getY()  * a.getZ() * h[3] -
+			 c.getY()  * h[0] * c.getZ() -
+			 c.getY() * a.getZ() * h[2] +
+			 c.getY() * h[0] * c.getZ();
+
+	inv[5] = a.getX()  * c.getZ() * h[3] -
+			 a.getX()  * h[2] * c.getZ() -
+			 c.getX()  * a.getZ() * h[3] +
+			 c.getX()  * h[0] * c.getZ() +
+			 c.getX() * a.getZ() * h[2] -
+			 c.getX() * h[0] * c.getZ();
+
+	inv[9] = -a.getX()  * c.getY() * h[3] +
+			 a.getX()  * h[2] * c.getY() +
+			 c.getX()  * a.getY() * h[3] -
+			 c.getX()  * h[0] * c.getY() -
+			 c.getX() * a.getY() * h[2] +
+			 c.getX() * h[0] * c.getY();
+
+	inv[13] = a.getX()  * c.getY() * c.getZ() -
+			  a.getX()  * c.getZ() * c.getY() -
+			  c.getX()  * a.getY() * c.getZ() +
+			  c.getX()  * a.getZ() * c.getY() +
+			  c.getX() * a.getY() * c.getZ() -
+			  c.getX() * a.getZ() * c.getY();
+
+	inv[2] = a.getY()  * b.getZ() * h[3] -
+			 a.getY()  * h[1] * c.getZ() -
+			 b.getY()  * a.getZ() * h[3] +
+			 b.getY()  * h[0] * c.getZ() +
+			 c.getY() * a.getZ() * h[1] -
+			 c.getY() * h[0] * b.getZ();
+
+	inv[6] = -a.getX()  * b.getZ() * h[3] +
+			 a.getX()  * h[1] * c.getZ() +
+			 b.getX()  * a.getZ() * h[3] -
+			 b.getX()  * h[0] * c.getZ() -
+			 c.getX() * a.getZ() * h[1] +
+			 c.getX() * h[0] * b.getZ();
+
+	inv[10] = a.getX()  * b.getY() * h[3] -
+			  a.getX()  * h[1] * c.getY() -
+			  b.getX()  * a.getY() * h[3] +
+			  b.getX()  * h[0] * c.getY() +
+			  c.getX() * a.getY() * h[1] -
+			  c.getX() * h[0] * b.getY();
+
+	inv[14] = -a.getX()  * b.getY() * c.getZ() +
+			  a.getX()  * b.getZ() * c.getY() +
+			  b.getX()  * a.getY() * c.getZ() -
+			  b.getX()  * a.getZ() * c.getY() -
+			  c.getX() * a.getY() * b.getZ() +
+			  c.getX() * a.getZ() * b.getY();
+
+	inv[3] = -a.getY() * b.getZ() * h[2] +
+			 a.getY() * h[1] * c.getZ() +
+			 b.getY() * a.getZ() * h[2] -
+			 b.getY() * h[0] * c.getZ() -
+			 c.getY() * a.getZ() * h[1] +
+			 c.getY() * h[0] * b.getZ();
+
+	inv[7] = a.getX() * b.getZ() * h[2] -
+			 a.getX() * h[1] * c.getZ() -
+			 b.getX() * a.getZ() * h[2] +
+			 b.getX() * h[0] * c.getZ() +
+			 c.getX() * a.getZ() * h[1] -
+			 c.getX() * h[0] * b.getZ();
+
+	inv[11] = -a.getX() * b.getY() * h[2] +
+			  a.getX() * h[1] * c.getY() +
+			  b.getX() * a.getY() * h[2] -
+			  b.getX() * h[0] * c.getY() -
+			  c.getX() * a.getY() * h[1] +
+			  c.getX() * h[0] * b.getY();
+
+	inv[15] = a.getX() * b.getY() * c.getZ() -
+			  a.getX() * b.getZ() * c.getY() -
+			  b.getX() * a.getY() * c.getZ() +
+			  b.getX() * a.getZ() * c.getY() +
+			  c.getX() * a.getY() * b.getZ() -
+			  c.getX() * a.getZ() * b.getY();
+
+
+	float det = a.getX() * inv[0] + a.getY() * inv[4] + a.getZ() * inv[8] + 0 * inv[12];
+	det = 1.0 / det;
+
+	for (int i = 0; i < 16; i++) {
+		inv[i] = inv[i] * det;
+	}
+
+	Vector v1(inv[0], inv[1], inv[2]);
+	Vector v2(inv[4], inv[5], inv[6]);
+	Vector v3(inv[8], inv[9], inv[10]);
+	Punto p1(inv[12], inv[13], inv[14]);
+
+	Matriz m(v1,v2,v3,p1);
+	m.setH(inv[3],inv[7],inv[11],inv[15]);
+	return m;
+}
+
 Vector Matriz::transformar (Vector* v){
 	Vector v1(a.getX()*v->getX() + b.getX()*v->getY() + c.getX()*v->getZ(), 
 			  a.getY()*v->getX() + b.getY()*v->getY() + c.getY()*v->getZ(),

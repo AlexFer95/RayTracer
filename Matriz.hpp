@@ -20,6 +20,9 @@ class Matriz{
 		Vector b; 
 		Vector c;
 		Punto p;
+
+	    //Coordenadas homogeneas, por defecto 0,0,0,1
+		float h[4];
 		
 	public:
 		//Constructores
@@ -33,6 +36,7 @@ class Matriz{
 		void setB(Vector b1);
 		void setC(Vector c1);
 		void setP(Punto p);
+		void setH(float h0, float h1, float h2, float h3);
 		
 		
 		//Getters de los vectores y el punto
@@ -40,12 +44,14 @@ class Matriz{
 		Vector getB();
 		Vector getC();
 		Punto getP();
+		float* getH();
 		Vector* getAref();
 		Vector* getBref();
 		Vector* getCref();
 		Punto* getPref();
 		
 		//Transformaciones con la matriz
+	    Matriz invertir();
 		Vector transformar(Vector* v);
 		Punto transformar(Punto* p);
 		
