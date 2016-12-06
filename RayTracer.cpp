@@ -23,7 +23,17 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
     fr[1] = lista_esferas[ultima_esfera]->getKd()[1]/PI + ks;
     fr[2] = lista_esferas[ultima_esfera]->getKd()[2]/PI + ks;
 }
+/**
+ * Devolvera la iluminación indirecta por montecarlo
+ * @param impacto
+ * @param fr
+ */
+void iluminacion_indirecta(Punto* interseccion, Vector* normal, float* fr){
+    Matriz T = coordLocales(*normal, *interseccion);
+    Esfera esfLocales[num_esferas];
+    cambiar_coord_escena(esfLocales,T);
 
+}
 //Calcula el vector reflejado dado el vector de un rayo y la normal respecto a la que se quiere reflejar
 Vector calcular_reflejado(Vector* rayo, Vector* normal){
     float omega_i_normal = Vector::pEscalar(rayo,normal);
@@ -144,6 +154,8 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float
         intensidad[1] = intensidad[1] + fr[1]*li*cos_theta_i;
         intensidad[2] = intensidad[2] + fr[2]*li*cos_theta_i;
     }
+    float li[3] = { 0.0, 0.0, 0.0 };
+    iluminacion_indirecta(&interseccion,&normal,li);
 }
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
@@ -297,4 +309,11 @@ Matriz coordLocales(Vector normal, Punto posicion){
     Vector v = Vector::pVectorial(&normal,&u);
 
     return  Matriz(u, v, normal, posicion);
+}
+
+Esfera cambiar_coord_escena(Esfera esfLocales[], Matriz T){
+    for(int i = 0; i < num_esferas; i++){
+        Esfera e = lista_esferas[i]->transformar(T);
+        esfLocales[i] = e;
+    }
 }

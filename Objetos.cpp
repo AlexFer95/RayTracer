@@ -111,7 +111,7 @@ Esfera::Esfera(Punto p, float r, Material material){
 Esfera::~Esfera(){
 }
 
-Objeto Esfera::transformar(Matriz coorLocales){
+Esfera Esfera::transformar(Matriz coorLocales){
     Punto nuevoOrigen = coorLocales.transformar(&origen);
     return Esfera(nuevoOrigen, radio, m);
 }

@@ -109,7 +109,7 @@ class Esfera : public Objeto{
         float getKr();
 		int getSuperficie();
 
-        Objeto transformar(Matriz coorLocales);
+        Esfera transformar(Matriz coorLocales);
 		
 		//Calcula la distancia de interseccion del rayo con la esfera
 		// Guarda en sol[0] la solucion con la raiz positiva o NaN si no existe

@@ -62,4 +62,6 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad);
 void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad);
 
+Matriz coordLocales(Vector normal, Punto posicion);
+Esfera cambiar_coord_escena(Esfera esfLocales[], Matriz T);
 #endif //RAYTRACER_RAYTRACER_H
