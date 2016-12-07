@@ -34,13 +34,13 @@ int num_luces = 2;
 FuenteLuz *lista_luces[] = {&f0,&f1};
 
 //Definir objetos de la escena
-Material p_azul = { azul , 0.05 , 0.0 , Phong};
-Material p_amar = { amarillo , 0.05 , 0.0 , Phong};
-Material p_mora = { morado , 0.05 , 0.0 , Phong};
-Material p_rojo = { rojo , 0.1 , 0.0 , Phong};
-Material p_azul2 = { azul2 , 0.9 , 0.0 , Phong};
-Material reflex = { negro , 0.0 , 1.0 , Reflexion};
-Material refrac = { negro , 0.0 , 1.54 , Refraccion};
+Material p_azul = { azul , 0.0 , 0.0 , 0.1 , Phong};
+Material p_amar = { amarillo , 0.0 , 0.0 , 0.1 , Phong};
+Material p_mora = { morado , 0.0 , 0.0 , 0.1 , Phong};
+Material p_rojo = { rojo , 0.1 , 0.0 , 0.1 , Phong};
+Material p_azul2 = { azul2 , 0.0 , 0.0 , 0.1 , Phong};
+Material reflex = { negro , 0.0 , 0.0 , 0.1 , Reflexion};
+Material refrac = { negro , 0.0 , 1.6 , 0.1 , Refraccion};
 
 Esfera suelo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
 Esfera techo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*-1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
@@ -62,6 +62,6 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad);
 void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad);
 
-Matriz coordLocales(Vector normal, Punto posicion);
-Esfera cambiar_coord_escena(Esfera esfLocales[], Matriz T);
+Matriz calcular_locales(Vector normal, Punto posicion);
+Esfera cambiar_escena_locales(Esfera esferasLocales[], FuenteLuz lucesLocales[], Matriz T);
 #endif //RAYTRACER_RAYTRACER_H

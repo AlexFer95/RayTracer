@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <random>
 #include "Punto.hpp"
 #include "Vector.hpp"
 #include "Matriz.hpp"
@@ -29,10 +30,38 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
  * @param fr
  */
 void iluminacion_indirecta(Punto* interseccion, Vector* normal, float* fr){
-    Matriz T = coordLocales(*normal, *interseccion);
-    Esfera esfLocales[num_esferas];
-    cambiar_coord_escena(esfLocales,T);
 
+    Matriz T = calcular_locales(*normal, *interseccion);
+    Matriz T_inversa = T.invertir();
+    Esfera esfLocales[num_esferas];
+    FuenteLuz flLocales[num_luces];
+    cambiar_escena_locales(esfLocales,flLocales,T);
+
+    random_device rd;   // non-deterministic generator
+    mt19937 gen(rd());  // to seed mersenne twister.
+    uniform_real_distribution<> dist(0.0,1.0);
+    for(int i=0 ; i<MAX_RAYOS ; i++){
+
+        //Generar numero aleatorio para theta y phi [0,1)
+        float th01 = dist(gen);
+        float ph01 = dist(gen);
+
+        //Calcular las muestras de theta y phi
+        float theta = acos(sqrt(1-th01));
+        float phi = 2*PI*ph01;
+
+        //Lanzar rayo
+        float f_x = ...
+
+        //Dividir resultado entre la p(x) correspondiente
+        float p_theta = 2*sin(theta)*cos(theta);
+        float p_phi = 1.0 / (2*PI);
+
+        //Agregar al acumulado
+        ...
+    }
+
+    resultado_final = acumulado / MAX_RAYOS;
 }
 //Calcula el vector reflejado dado el vector de un rayo y la normal respecto a la que se quiere reflejar
 Vector calcular_reflejado(Vector* rayo, Vector* normal){
@@ -189,6 +218,7 @@ void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, 
     //Se calcula la normal
     Punto centro_ultima = lista_esferas[ultima]->getOrigen();
     Vector normal = Vector::getDireccion(&centro_ultima,&interseccion);
+
     float refraccionEntrada = 1;
     float refraccionSalida =  lista_esferas[ultima]->getKr();
     if(Vector::cosenoVector(&rayo_previo,&normal)<0){
@@ -295,7 +325,7 @@ int main() {
     return 0;
 }
 
-Matriz coordLocales(Vector normal, Punto posicion){
+Matriz calcular_locales(Vector normal, Punto posicion){
     Vector cualquiera = Vector(1,0,0);
     Vector u = Vector::pVectorial(&normal,&cualquiera);
     if(u.modulo()==0){
@@ -311,9 +341,14 @@ Matriz coordLocales(Vector normal, Punto posicion){
     return  Matriz(u, v, normal, posicion);
 }
 
-Esfera cambiar_coord_escena(Esfera esfLocales[], Matriz T){
+Esfera cambiar_escena_locales(Esfera esferasLocales[], FuenteLuz lucesLocales[], Matriz T){
     for(int i = 0; i < num_esferas; i++){
         Esfera e = lista_esferas[i]->transformar(T);
-        esfLocales[i] = e;
+        esferasLocales[i] = e;
+    }
+
+    for(int i = 0; i < num_luces; i++){
+        FuenteLuz l = lista_luces[i]->transformar(T);
+        lucesLocales[i] = l;
     }
 }

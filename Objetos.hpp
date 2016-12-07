@@ -25,6 +25,7 @@ struct Material{
 	const float* kd;
 	float ks;
 	float kr;
+    float absorcion;
 	Superficie s;
 };
 
@@ -43,7 +44,6 @@ class Objeto{
 		//Getters
 		Punto getOrigen();
 		Vector getVPosicion();
-        Objeto transformar(Matriz coorLocales);
 };
 
 class FuenteLuz : public Objeto{
@@ -59,6 +59,8 @@ class FuenteLuz : public Objeto{
 		
 		//Getters
 		float getEnergia();
+
+        FuenteLuz transformar(Matriz coorLocales);
 };
 
 class Rayo : public Objeto{

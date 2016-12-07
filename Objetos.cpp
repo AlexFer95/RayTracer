@@ -51,6 +51,11 @@ float FuenteLuz::getEnergia(){
 	return energia;
 }
 
+FuenteLuz FuenteLuz::transformar(Matriz coorLocales){
+    Punto nuevoOrigen = coorLocales.transformar(&origen);
+    return FuenteLuz(nuevoOrigen, energia);
+}
+
 /*****************************************************************************/
 /************************************RAYO*************************************/
 /*****************************************************************************/
@@ -111,10 +116,6 @@ Esfera::Esfera(Punto p, float r, Material material){
 Esfera::~Esfera(){
 }
 
-Esfera Esfera::transformar(Matriz coorLocales){
-    Punto nuevoOrigen = coorLocales.transformar(&origen);
-    return Esfera(nuevoOrigen, radio, m);
-}
 //Getters
 float Esfera::getRadio(){
 	return radio;
@@ -134,7 +135,12 @@ float Esfera::getKr(){
 int Esfera::getSuperficie(){
     return m.s;
 }
-		
+
+Esfera Esfera::transformar(Matriz coorLocales){
+    Punto nuevoOrigen = coorLocales.transformar(&origen);
+    return Esfera(nuevoOrigen, radio, m);
+}
+
 //Calcula la distancia de interseccion del rayo con la esfera
 // Guarda en sol[0] la solucion con la raiz positiva o NaN si no existe
 // Guarda en sol[1] la solucion con la raiz negatica o NaN si no existe
