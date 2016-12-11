@@ -29,7 +29,7 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
  * @param impacto
  * @param fr
  */
-void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr){
+void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, float* fr){
 
     Matriz T = calcular_locales(normal, interseccion);
     Matriz T_inversa = T.invertir();
@@ -62,7 +62,7 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr){
             //Se lanzan rayos secundarios
             Vector desplazamiento = Vector::productoEscalar(&omega_i, punto_mas_cercano);
             Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-            lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo(), mas_cercana, MAX_REBOTES, 0, intensidad);
+            lanzar_secundarios(interseccion, sig_origen, dist_acum + desplazamiento.modulo(), mas_cercana, MAX_REBOTES, 0, intensidad);
         }
         //Dividir resultado entre la p(x) correspondiente
         float p_theta = 2*sin(theta)*cos(theta);
@@ -204,7 +204,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
 
     if(rebotesInderectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-        iluminacion_indirecta(interseccion,normal,luzIndirecta);
+        iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta);
         intensidad[0] = intensidad[0] + luzIndirecta[0];
         intensidad[1] = intensidad[1] + luzIndirecta[1];
         intensidad[2] = intensidad[2] + luzIndirecta[2];
@@ -291,12 +291,17 @@ int main() {
     //Creamos el fichero en el que guardar la vision de la escena
     ofstream fs("Prueba.ppm");
     fs << "P3" << endl << ANCHO_IMAGEN << " " << ALTO_IMAGEN << endl << COLOR_IMAGEN << endl;
+    //variable para ver porque pixel va el programa
+    float nIteracion=0;
     double i=ALTO_PANTALLA/2.0;
     for (int ind = 0 ; ind<ALTO_IMAGEN ; ind++) {
         i=i-TAM_PIXEL;
         double j=-ANCHO_PANTALLA/2.0 ;
         for (int ind2 = 0; ind2<ANCHO_IMAGEN ; ind2++) {
             j=j+TAM_PIXEL;
+
+            cout << nIteracion/(ANCHO_IMAGEN*ALTO_IMAGEN) <<"%\n";
+            nIteracion++;
 
             if(i < ALTO_PANTALLA/2.0 - TAM_PIXEL*200){
                 i=i+0;
