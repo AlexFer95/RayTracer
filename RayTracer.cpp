@@ -40,7 +40,6 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr){
     random_device rd;   // non-deterministic generator
     mt19937 gen(rd());  // to seed mersenne twister.
     uniform_real_distribution<> dist(0.0,1.0);
-    float fAcum[3] = {0,0,0};
     for(int i=0 ; i<MAX_RAYOS ; i++){
 
         //Generar numero aleatorio para theta y phi [0,1)
@@ -73,12 +72,14 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr){
         intensidad[2] /= p_theta*p_phi;
 
         //Agregar al acumulado
-        fAcum[0] += intensidad[0];
-        fAcum[1] += intensidad[1];
-        fAcum[2] += intensidad[2];
+        fr[0] += intensidad[0];
+        fr[1] += intensidad[1];
+        fr[2] += intensidad[2];
     }
 
-    resultado_final = acumulado / MAX_RAYOS;
+    fr[0] /= MAX_RAYOS;
+    fr[1] /= MAX_RAYOS;
+    fr[2] /= MAX_RAYOS;
 }
 //Calcula el vector reflejado dado el vector de un rayo y la normal respecto a la que se quiere reflejar
 Vector calcular_reflejado(Vector* rayo, Vector* normal){
@@ -200,8 +201,11 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float
         intensidad[1] = intensidad[1] + fr[1]*li*cos_theta_i;
         intensidad[2] = intensidad[2] + fr[2]*li*cos_theta_i;
     }
-    float li[3] = { 0.0, 0.0, 0.0 };
-    iluminacion_indirecta(interseccion,normal,li);
+    float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
+    iluminacion_indirecta(interseccion,normal,luzIndirecta);
+    intensidad[0] = intensidad[0] + luzIndirecta[0];
+    intensidad[1] = intensidad[1] + luzIndirecta[1];
+    intensidad[2] = intensidad[2] + luzIndirecta[2];
 }
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
