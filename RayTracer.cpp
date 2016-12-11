@@ -29,9 +29,9 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
  * @param impacto
  * @param fr
  */
-void iluminacion_indirecta(Punto* interseccion, Vector* normal, float* fr){
+void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr){
 
-    Matriz T = calcular_locales(*normal, *interseccion);
+    Matriz T = calcular_locales(normal, interseccion);
     Matriz T_inversa = T.invertir();
     Esfera esfLocales[num_esferas];
     FuenteLuz flLocales[num_luces];
@@ -40,6 +40,7 @@ void iluminacion_indirecta(Punto* interseccion, Vector* normal, float* fr){
     random_device rd;   // non-deterministic generator
     mt19937 gen(rd());  // to seed mersenne twister.
     uniform_real_distribution<> dist(0.0,1.0);
+    float fAcum[3] = {0,0,0};
     for(int i=0 ; i<MAX_RAYOS ; i++){
 
         //Generar numero aleatorio para theta y phi [0,1)
@@ -51,14 +52,30 @@ void iluminacion_indirecta(Punto* interseccion, Vector* normal, float* fr){
         float phi = 2*PI*ph01;
 
         //Lanzar rayo
-        float f_x = ...
+        Vector omega_i = Vector(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+        Rayo rIndirecto(interseccion, omega_i);
 
+        int mas_cercana;           //Indice de la esfera mas cercana
+        float punto_mas_cercano ; //Distancia a la que se encuentra el punto de interseccion
+        colisionRayoObjetos(&rIndirecto, &mas_cercana, &punto_mas_cercano); // Esfera con la que colisiona el rayo
+        float intensidad[3] = {0.0, 0.0, 0.0};
+        if (mas_cercana != -1) { //Si no ha intersectado con nada -> NEGRO
+            //Se lanzan rayos secundarios
+            Vector desplazamiento = Vector::productoEscalar(&omega_i, punto_mas_cercano);
+            Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
+            lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo(), mas_cercana, 1, intensidad);
+        }
         //Dividir resultado entre la p(x) correspondiente
         float p_theta = 2*sin(theta)*cos(theta);
         float p_phi = 1.0 / (2*PI);
+        intensidad[0] /= p_theta*p_phi;
+        intensidad[1] /= p_theta*p_phi;
+        intensidad[2] /= p_theta*p_phi;
 
         //Agregar al acumulado
-        ...
+        fAcum[0] += intensidad[0];
+        fAcum[1] += intensidad[1];
+        fAcum[2] += intensidad[2];
     }
 
     resultado_final = acumulado / MAX_RAYOS;
@@ -184,7 +201,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float
         intensidad[2] = intensidad[2] + fr[2]*li*cos_theta_i;
     }
     float li[3] = { 0.0, 0.0, 0.0 };
-    iluminacion_indirecta(&interseccion,&normal,li);
+    iluminacion_indirecta(interseccion,normal,li);
 }
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
@@ -245,6 +262,7 @@ void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, 
 }
 //Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
 void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
+
     if(rebotes != 0) {
         switch (lista_esferas[ultima]->getSuperficie()) {
             case Phong:
