@@ -24,6 +24,7 @@ const float ANCHO_PANTALLA = 2*tan(30*PI/180)*DISTANCIA_PANTALLA;
 const float ALTO_PANTALLA = ANCHO_PANTALLA;
 const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
 const int MAX_RAYOS = 100;
+const int MAX_REBOTES_IND = 1;
 //VARIABLES DEL TRAZADOR
 Punto origen(0, 0, 0); //Origen del sistema
 Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0)); //camara(matriz)
@@ -60,7 +61,7 @@ float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia);
 void colisionRayoObjetos(Rayo* r, int* i, float* j);
 void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float* intensidad);
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad);
-void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad);
+void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 
 Matriz calcular_locales(Vector normal, Punto posicion);
 Esfera cambiar_escena_locales(Esfera esferasLocales[], FuenteLuz lucesLocales[], Matriz T);

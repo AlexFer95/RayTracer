@@ -62,7 +62,7 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr){
             //Se lanzan rayos secundarios
             Vector desplazamiento = Vector::productoEscalar(&omega_i, punto_mas_cercano);
             Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-            lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo(), mas_cercana, 1, intensidad);
+            lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo(), mas_cercana, MAX_REBOTES, 0, intensidad);
         }
         //Dividir resultado entre la p(x) correspondiente
         float p_theta = 2*sin(theta)*cos(theta);
@@ -159,7 +159,7 @@ void colisionRayoObjetos(Rayo* r, int* i, float* j){
     *j = punto_mas_cercano;
 }
 
-void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float* intensidad){
+void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotesInderectos, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
     rayo_previo.normalizar();
 
@@ -201,11 +201,15 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float
         intensidad[1] = intensidad[1] + fr[1]*li*cos_theta_i;
         intensidad[2] = intensidad[2] + fr[2]*li*cos_theta_i;
     }
-    float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-    iluminacion_indirecta(interseccion,normal,luzIndirecta);
-    intensidad[0] = intensidad[0] + luzIndirecta[0];
-    intensidad[1] = intensidad[1] + luzIndirecta[1];
-    intensidad[2] = intensidad[2] + luzIndirecta[2];
+
+    if(rebotesInderectos>0){
+        float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
+        iluminacion_indirecta(interseccion,normal,luzIndirecta);
+        intensidad[0] = intensidad[0] + luzIndirecta[0];
+        intensidad[1] = intensidad[1] + luzIndirecta[1];
+        intensidad[2] = intensidad[2] + luzIndirecta[2];
+    }
+
 }
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
@@ -229,7 +233,7 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, intensidad);
+        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, MAX_REBOTES_IND, intensidad);
     }
 }
 void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
@@ -261,16 +265,15 @@ void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, 
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, intensidad);
+        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, MAX_REBOTES_IND, intensidad);
     }
 }
 //Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
-void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad){
-
+void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
     if(rebotes != 0) {
         switch (lista_esferas[ultima]->getSuperficie()) {
             case Phong:
-                fPhong(previo, interseccion, dist_acum, ultima, intensidad);
+                fPhong(previo, interseccion, dist_acum, ultima, rebotesIndirectos, intensidad);
                 break;
             case Reflexion:
                 fReflexion(previo, interseccion, dist_acum, ultima, rebotes, intensidad);
@@ -317,7 +320,7 @@ int main() {
                 Vector desplazamiento = Vector::productoEscalar(&d, punto_mas_cercano);
                 Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
                 float intensidad[3] = {0.0, 0.0, 0.0};
-                lanzar_secundarios(camara.getP(), sig_origen, desplazamiento.modulo(), mas_cercana, MAX_REBOTES, intensidad);
+                lanzar_secundarios(camara.getP(), sig_origen, desplazamiento.modulo(), mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
 
                 for (int k = 0; k < num_esferas; k++) {
                     if (mas_cercana == k) {
