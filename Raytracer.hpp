@@ -16,14 +16,14 @@
 #define EPSILON 0.001
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
-const float ANCHO_IMAGEN = 400;
+const float ANCHO_IMAGEN = 200;
 const float ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
 const float DISTANCIA_PANTALLA = 0.1;
 const float ANCHO_PANTALLA = 2*tan(30*PI/180)*DISTANCIA_PANTALLA;
 const float ALTO_PANTALLA = ANCHO_PANTALLA;
 const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
-const int MAX_RAYOS = 50;
+const int MAX_RAYOS = 20;
 const int MAX_REBOTES_IND = 1;
 //VARIABLES DEL TRAZADOR
 Punto origen(0, 0, 0); //Origen del sistema
@@ -44,7 +44,7 @@ Material reflex = { negro , 0.0 , 0.0 , 0.1 , Reflexion};
 Material refrac = { negro , 0.0 , 1.6 , 0.1 , Refraccion};
 
 Esfera suelo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
-Esfera techo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*-1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
+Esfera techo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*-1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_mora);
 Esfera fondo(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*1020), DISTANCIA_PANTALLA*1000, p_amar);
 Esfera frente(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*-1010), DISTANCIA_PANTALLA*1000, p_amar);
 Esfera izquierda(Punto(camara.getPref()->getX() + DISTANCIA_PANTALLA*-1010, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_mora);

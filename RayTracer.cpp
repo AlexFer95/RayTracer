@@ -29,7 +29,7 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
  * @param impacto
  * @param fr
  */
-void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, float* fr){
+void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, float* fr, Vector omega_o, int esfera){
 
     Matriz T = calcular_locales(normal, interseccion);
     Matriz T_inversa = T.invertir();
@@ -43,8 +43,9 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
     for(int i=0 ; i<MAX_RAYOS ; i++){
 
         //Generar numero aleatorio para theta y phi [0,1)
-        float th01 = dist(gen);
-        float ph01 = dist(gen);
+        float th01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+                //dist(gen);
+        float ph01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
         //Calcular las muestras de theta y phi
         float theta = acos(sqrt(1-th01));
@@ -64,6 +65,13 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
             Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
             lanzar_secundarios(interseccion, sig_origen, dist_acum + desplazamiento.modulo(), mas_cercana, MAX_REBOTES, 0, intensidad);
         }
+        float intensidad_brdf[3] = {0.0, 0.0, 0.0};
+        brdf(&omega_i, &omega_i, esfera, intensidad_brdf);
+        float valor = abs(cos(theta))*abs(sin(theta));
+        intensidad[0] *= intensidad_brdf[0]*valor;
+        intensidad[1] *= intensidad_brdf[1]*valor;
+        intensidad[2] *= intensidad_brdf[2]*valor;
+
         //Dividir resultado entre la p(x) correspondiente
         float p_theta = 2*sin(theta)*cos(theta);
         float p_phi = 1.0 / (2*PI);
@@ -193,9 +201,6 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
         if(cos_theta_i<0){
             cos_theta_i = -cos_theta_i;
         }
-        if(li>0 & i==1){
-            i = 5;
-        }
         //Se añade la luz al total
         intensidad[0] = intensidad[0] + fr[0]*li*cos_theta_i;
         intensidad[1] = intensidad[1] + fr[1]*li*cos_theta_i;
@@ -204,10 +209,10 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
 
     if(rebotesInderectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-        iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta);
-        intensidad[0] = intensidad[0] + luzIndirecta[0]*0.1;
-        intensidad[1] = intensidad[1] + luzIndirecta[1]*0.1;
-        intensidad[2] = intensidad[2] + luzIndirecta[2]*0.1;
+        iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, rayo_previo, ultima);
+        intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
+        intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
+        intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
     }
 
 }
@@ -236,7 +241,7 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
-void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos float* intensidad){
+void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
     rayo_previo.normalizar();
 
