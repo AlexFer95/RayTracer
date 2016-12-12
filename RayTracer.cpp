@@ -211,9 +211,9 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
     if(rebotesInderectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
         iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, rayo_previo, ultima);
-        intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
-        intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
-        intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
+        intensidad[0] = intensidad[0] + luzIndirecta[0];
+        intensidad[1] = intensidad[1] + luzIndirecta[1];
+        intensidad[2] = intensidad[2] + luzIndirecta[2];
     }
 
 }
