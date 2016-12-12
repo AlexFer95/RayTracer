@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cmath>
 #include <random>
+#include <time.h>
 #include "Punto.hpp"
 #include "Vector.hpp"
 #include "Matriz.hpp"
@@ -35,16 +36,14 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
     Matriz T_inversa = T.invertir();
     Esfera esfLocales[num_esferas];
     FuenteLuz flLocales[num_luces];
-    cambiar_escena_locales(esfLocales,flLocales,T);
+    cambiar_coord_escena(esfLocales,flLocales,T);
 
-    random_device rd;   // non-deterministic generator
-    mt19937 gen(rd());  // to seed mersenne twister.
-    uniform_real_distribution<> dist(0.0,1.0);
+    srand(time(NULL));
+
     for(int i=0 ; i<MAX_RAYOS ; i++){
 
         //Generar numero aleatorio para theta y phi [0,1)
         float th01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-                //dist(gen);
         float ph01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
         //Calcular las muestras de theta y phi
@@ -88,6 +87,8 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
     fr[0] /= MAX_RAYOS;
     fr[1] /= MAX_RAYOS;
     fr[2] /= MAX_RAYOS;
+
+    reestablecer_globales();
 }
 //Calcula el vector reflejado dado el vector de un rayo y la normal respecto a la que se quiere reflejar
 Vector calcular_reflejado(Vector* rayo, Vector* normal){
@@ -293,19 +294,28 @@ void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int u
 
 
 int main() {
-    //Creamos el fichero en el que guardar la vision de la escena
-    ofstream fs("Prueba.ppm");
-    fs << "P3" << endl << ANCHO_IMAGEN << " " << ALTO_IMAGEN << endl << COLOR_IMAGEN << endl;
+
+    //Creamos el buffer
+    buffer = new float**[ANCHO_IMAGEN];
+    for(int i=0 ; i<ANCHO_IMAGEN ; i++){
+        buffer[i] = new float*[ALTO_IMAGEN];
+        for(int j=0 ; j<ALTO_IMAGEN ; j++){
+            buffer[i][j] = new float[3];
+        }
+    }
+
     //variable para ver porque pixel va el programa
-    float nIteracion=0;
+    int nIteracion=0;
+    int max_iteraciones = ANCHO_IMAGEN*ALTO_IMAGEN;
+
+    float max_color = 0.0;
     double i=ALTO_PANTALLA/2.0;
+
     for (int ind = 0 ; ind<ALTO_IMAGEN ; ind++) {
         i=i-TAM_PIXEL;
         double j=-ANCHO_PANTALLA/2.0 ;
         for (int ind2 = 0; ind2<ANCHO_IMAGEN ; ind2++) {
             j=j+TAM_PIXEL;
-
-            cout << nIteracion/(ANCHO_IMAGEN*ALTO_IMAGEN) <<"%\n";
             nIteracion++;
 
             if(i < ALTO_PANTALLA/2.0 - TAM_PIXEL*200){
@@ -324,7 +334,9 @@ int main() {
             colisionRayoObjetos(&r, &mas_cercana, &punto_mas_cercano); // Esfera con la que colisiona el rayo
 
             if (mas_cercana == -1) { //Si no ha intersectado con nada -> NEGRO
-                fs << "0 0 0  ";
+                buffer[ind2][ind][0] = 0.0;
+                buffer[ind2][ind][1] = 0.0;
+                buffer[ind2][ind][2] = 0.0;
             } else {
                 //Se lanzan rayos secundarios
                 Vector desplazamiento = Vector::productoEscalar(&d, punto_mas_cercano);
@@ -335,28 +347,50 @@ int main() {
                 for (int k = 0; k < num_esferas; k++) {
                     if (mas_cercana == k) {
 
-                        if(intensidad[0]>255){
-                            intensidad[0]=255;
+                        if(intensidad[0]>max_color){
+                            max_color = intensidad[0];
                         }
-                        if(intensidad[1]>255){
-                            intensidad[1]=255;
+                        if(intensidad[1]>max_color){
+                            max_color = intensidad[1];
                         }
-                        if(intensidad[2]>255){
-                            intensidad[2]=255;
+                        if(intensidad[2]>max_color){
+                            max_color = intensidad[2];
                         }
-
-                        fs << (int) intensidad[0] << " "
-                           << (int) intensidad[1] << " "
-                           << (int) intensidad[2] << "  ";
+                        buffer[ind2][ind][0] = intensidad[0];
+                        buffer[ind2][ind][1] = intensidad[1];
+                        buffer[ind2][ind][2] = intensidad[2];
                     }
-
-                    fs.flush();
                 }
             }
         }
+        cout << (float)nIteracion/(float)max_iteraciones * 100 <<"%\n";
+    }
+
+    //Escribimos la cabecera del fichero de salida
+    ofstream fs("Prueba.ppm");
+    fs << "P3" << endl << ANCHO_IMAGEN << " " << ALTO_IMAGEN << endl << COLOR_IMAGEN << endl;
+
+    //Volcamos el buffer en el fichero
+    for(int i=0 ; i<ALTO_IMAGEN ; i++){
+        for(int j=0 ; j<ANCHO_IMAGEN ; j++){
+            for(int k=0 ; k<3 ; k++){
+                fs << (int) 255*buffer[j][i][k]/max_color << " ";
+            }
+            fs << " ";
+        }
         fs << endl;
     }
+    fs.flush();
     fs.close();
+
+    //Destruimos el buffer
+    for(int i=0 ; i<ANCHO_IMAGEN ; i++){
+        for(int j=0 ; j<ALTO_IMAGEN ; j++){
+            delete[] buffer[i][j];
+        }
+        delete[] buffer[i];
+    }
+
     return 0;
 }
 
@@ -376,14 +410,29 @@ Matriz calcular_locales(Vector normal, Punto posicion){
     return  Matriz(u, v, normal, posicion);
 }
 
-Esfera cambiar_escena_locales(Esfera esferasLocales[], FuenteLuz lucesLocales[], Matriz T){
+void cambiar_coord_escena(Esfera esferasLocales[], FuenteLuz lucesLocales[], Matriz T){
     for(int i = 0; i < num_esferas; i++){
-        Esfera e = lista_esferas[i]->transformar(T);
-        esferasLocales[i] = e;
+        esferasLocales[i] = lista_esferas[i]->transformar(T);;
+        lista_esferas[i] = &esferasLocales[i];
     }
 
     for(int i = 0; i < num_luces; i++){
-        FuenteLuz l = lista_luces[i]->transformar(T);
-        lucesLocales[i] = l;
+        lucesLocales[i] = lista_luces[i]->transformar(T);
+        lista_luces[i] = &lucesLocales[i];
     }
+}
+
+void reestablecer_globales(){
+    lista_esferas[0] = &suelo;
+    lista_esferas[1] = &techo;
+    lista_esferas[2] = &fondo;
+    lista_esferas[3] = &frente;
+    lista_esferas[4] = &izquierda;
+    lista_esferas[5] = &derecha;
+    lista_esferas[6] = &e0;
+    lista_esferas[7] = &e1;
+    lista_esferas[8] = &e2;
+
+    lista_luces[0] = &f1;
+    lista_luces[1] = &f1;
 }
