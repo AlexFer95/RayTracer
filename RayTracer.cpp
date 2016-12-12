@@ -374,7 +374,12 @@ int main() {
     for(int i=0 ; i<ALTO_IMAGEN ; i++){
         for(int j=0 ; j<ANCHO_IMAGEN ; j++){
             for(int k=0 ; k<3 ; k++){
-                fs << (int) 255*buffer[j][i][k]/max_color << " ";
+                if(max_color > 255) {
+                    fs << (int) (255 * buffer[j][i][k] / max_color) << " ";
+                }
+                else{
+                    fs << (int) buffer[j][i][k] << " ";
+                }
             }
             fs << " ";
         }
