@@ -32,12 +32,13 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
  */
 void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, float* fr, Vector omega_o, int esfera){
 
+
     Matriz T = calcular_locales(normal, interseccion);
     Matriz T_inversa = T.invertir();
     Esfera esfLocales[num_esferas];
     FuenteLuz flLocales[num_luces];
-    cambiar_coord_escena(esfLocales,flLocales,T);
-
+    /*cambiar_coord_escena(esfLocales,flLocales,T_inversa);
+    interseccion = Punto(0,0,0);*/
     srand(time(NULL));
 
     for(int i=0 ; i<MAX_RAYOS ; i++){
@@ -51,7 +52,8 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
         float phi = 2*PI*ph01;
 
         //Lanzar rayo
-        Vector omega_i = Vector(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+        Vector v = Vector(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+        Vector omega_i = T.transformar(&v);
         Rayo rIndirecto(interseccion, omega_i);
 
         int mas_cercana;           //Indice de la esfera mas cercana
@@ -65,7 +67,7 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
             lanzar_secundarios(interseccion, sig_origen, dist_acum + desplazamiento.modulo(), mas_cercana, MAX_REBOTES, 0, intensidad);
         }
         float intensidad_brdf[3] = {0.0, 0.0, 0.0};
-        brdf(&omega_i, &omega_i, esfera, intensidad_brdf);
+        brdf(&omega_i, &omega_o, esfera, intensidad_brdf);
         float valor = abs(cos(theta))*abs(sin(theta));
         intensidad[0] *= intensidad_brdf[0]*valor;
         intensidad[1] *= intensidad_brdf[1]*valor;
@@ -88,7 +90,7 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
     fr[1] /= MAX_RAYOS;
     fr[2] /= MAX_RAYOS;
 
-    reestablecer_globales();
+    //reestablecer_globales();
 }
 //Calcula el vector reflejado dado el vector de un rayo y la normal respecto a la que se quiere reflejar
 Vector calcular_reflejado(Vector* rayo, Vector* normal){
@@ -211,9 +213,9 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
     if(rebotesInderectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
         iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, rayo_previo, ultima);
-        intensidad[0] = intensidad[0] + luzIndirecta[0];
-        intensidad[1] = intensidad[1] + luzIndirecta[1];
-        intensidad[2] = intensidad[2] + luzIndirecta[2];
+        intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
+        intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
+        intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
     }
 
 }
@@ -438,6 +440,6 @@ void reestablecer_globales(){
     lista_esferas[7] = &e1;
     lista_esferas[8] = &e2;
 
-    lista_luces[0] = &f1;
+    lista_luces[0] = &f0;
     lista_luces[1] = &f1;
 }
