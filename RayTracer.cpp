@@ -11,6 +11,8 @@
 
 using namespace std;
 
+std::default_random_engine generator;
+std::uniform_real_distribution<float> distribution(0.0,1.0);
 //FUNCIONES Y METODOS
 //Calcula la luz siguiendo la brdf de phong dados el vector incidente, el reflejado y la esfera con la que se ha intersectado
 void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
@@ -39,14 +41,15 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
     FuenteLuz flLocales[num_luces];
     /*cambiar_coord_escena(esfLocales,flLocales,T_inversa);
     interseccion = Punto(0,0,0);*/
-    srand(time(NULL));
 
     for(int i=0 ; i<MAX_RAYOS ; i++){
 
         //Generar numero aleatorio para theta y phi [0,1)
-        float th01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        float ph01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        //float th01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        //float ph01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
+        float th01 = distribution(generator);
+        float ph01 = distribution(generator);
         //Calcular las muestras de theta y phi
         float theta = acos(sqrt(1-th01));
         float phi = 2*PI*ph01;
@@ -84,8 +87,11 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
         fr[0] += intensidad[0];
         fr[1] += intensidad[1];
         fr[2] += intensidad[2];
-    }
 
+        if(((int)fr[0])<0){
+            fr[0]=0;
+        }
+    }
     fr[0] /= MAX_RAYOS;
     fr[1] /= MAX_RAYOS;
     fr[2] /= MAX_RAYOS;
@@ -201,6 +207,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
 
         //Calculamos el coseno
         float cos_theta_i = Vector::cosenoVector(&normal, &omega_i);
+        cos_theta_i = Vector::pEscalar(&normal, &omega_i);
         if(cos_theta_i<0){
             cos_theta_i = -cos_theta_i;
         }
@@ -212,7 +219,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
 
     if(rebotesInderectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-        iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, rayo_previo, ultima);
+        iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, omega_r, ultima);
         intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
         intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
         intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
@@ -297,6 +304,8 @@ void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int u
 
 int main() {
 
+    //srand(time(NULL));
+
     //Creamos el buffer
     buffer = new float**[ANCHO_IMAGEN];
     for(int i=0 ; i<ANCHO_IMAGEN ; i++){
@@ -320,6 +329,9 @@ int main() {
             j=j+TAM_PIXEL;
             nIteracion++;
 
+            if(nIteracion==29400){
+                nIteracion++;
+            }
             if(i < ALTO_PANTALLA/2.0 - TAM_PIXEL*200){
                 i=i+0;
             }
@@ -376,6 +388,7 @@ int main() {
     for(int i=0 ; i<ALTO_IMAGEN ; i++){
         for(int j=0 ; j<ANCHO_IMAGEN ; j++){
             for(int k=0 ; k<3 ; k++){
+
                 if(max_color > 255) {
                     fs << (int) (255 * buffer[j][i][k] / max_color) << " ";
                 }
