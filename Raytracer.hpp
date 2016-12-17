@@ -16,14 +16,14 @@
 #define EPSILON 0.001
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
-const int ANCHO_IMAGEN = 200;
+const int ANCHO_IMAGEN = 250;
 const int ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
 const float DISTANCIA_PANTALLA = 0.1;
 const float ANCHO_PANTALLA = 2*tan(30*PI/180)*DISTANCIA_PANTALLA;
 const float ALTO_PANTALLA = ANCHO_PANTALLA;
 const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
-const int MAX_RAYOS = 4;
+const int MAX_RAYOS = 16;
 const int MAX_REBOTES_IND = 1;
 
 //VARIABLES DEL TRAZADOR
@@ -62,8 +62,8 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr);
 Vector calcular_reflejado(Vector* rayo, Vector* normal);
 float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia);
 void colisionRayoObjetos(Rayo* r, int* i, float* j);
-void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, float* intensidad);
-void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, float* intensidad);
+void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
+void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 
 Matriz calcular_locales(Vector normal, Punto posicion);
