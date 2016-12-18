@@ -67,7 +67,7 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
             //Se lanzan rayos secundarios
             Vector desplazamiento = Vector::productoEscalar(&omega_i, punto_mas_cercano);
             Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-            lanzar_secundarios(interseccion, sig_origen, dist_acum + desplazamiento.modulo(), mas_cercana, rebotes, 0, intensidad);
+            lanzar_secundarios(interseccion, sig_origen, /*dist_acum +*/ desplazamiento.modulo(), mas_cercana, rebotes, 0, intensidad);
         }
         float intensidad_brdf[3] = {0.0, 0.0, 0.0};
         brdf(&omega_i, &omega_o, esfera, intensidad_brdf);
@@ -328,7 +328,7 @@ int main() {
             j=j+TAM_PIXEL;
             nIteracion++;
 
-            if(nIteracion==29400){
+            if(nIteracion==20550){
                 nIteracion++;
             }
             if(i < ALTO_PANTALLA/2.0 - TAM_PIXEL*200){
@@ -355,7 +355,7 @@ int main() {
                 Vector desplazamiento = Vector::productoEscalar(&d, punto_mas_cercano);
                 Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
                 float intensidad[3] = {0.0, 0.0, 0.0};
-                lanzar_secundarios(camara.getP(), sig_origen, desplazamiento.modulo(), mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
+                lanzar_secundarios(camara.getP(), sig_origen, 0, mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
 
                 for (int k = 0; k < num_esferas; k++) {
                     if (mas_cercana == k) {
