@@ -7,16 +7,6 @@
 #include "Punto.hpp"
 #include "Matriz.hpp"
 
-//COLORES
-const float amarillo[3] = { 1.0 , 1.0 , 0.1 };
-const float azul[3] = { 0.1 , 1.0 , 1.0 };
-const float azul2[3] = { 0.1 , 0.1 , 1.0 };
-const float morado[3] = { 1.0 , 0.1 , 1.0 };
-const float negro[3] = { 0.0 , 0.0 , 0.0 };
-const float rojo[3] = { 1.0 , 0.1 , 0.1 };
-const float verde[3] = { 0.1 , 1.0 , 0.1 };
-const float gris[3] = { 0.5 , 0.5 , 0.5};
-
 enum Superficie{
 	Phong = 0,
 	Reflexion = 1,

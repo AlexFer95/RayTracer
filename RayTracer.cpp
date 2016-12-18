@@ -2,7 +2,6 @@
 #include <fstream>
 #include <cmath>
 #include <random>
-#include <time.h>
 #include "Punto.hpp"
 #include "Vector.hpp"
 #include "Matriz.hpp"
@@ -11,10 +10,9 @@
 
 using namespace std;
 
-
-
 //FUNCIONES Y METODOS
 
+//Carga la escena elegida
 void cargar_escena(int escena){
     switch(escena){
         case 1:
@@ -30,6 +28,7 @@ void cargar_escena(int escena){
     }
 }
 
+//Calcula la matriz de transformacion a coordenadas locales/globales dada la normal y un punto
 Matriz calcular_locales(Vector normal, Punto posicion){
     Vector cualquiera = Vector(1,0,0);
     Vector u = Vector::pVectorial(&normal,&cualquiera);
@@ -59,13 +58,9 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
     fr[1] = lista_esferas[ultima_esfera]->getKd()[1]/PI + ks;
     fr[2] = lista_esferas[ultima_esfera]->getKd()[2]/PI + ks;
 }
-/**
- * Devolvera la iluminación indirecta por montecarlo
- * @param impacto
- * @param fr
- */
-void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, float* fr, Vector omega_o, int esfera, int rebotes){
 
+//Calcula la iluminación indirecta por montecarlo
+void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, float* fr, Vector omega_o, int esfera, int rebotes){
 
     Matriz T = calcular_locales(normal, interseccion);
 
@@ -129,10 +124,8 @@ Vector calcular_reflejado(Vector* rayo, Vector* normal){
     Vector menos_dos_anterior = Vector::productoEscalar(&previo_mas_anterior, -2);
     return Vector::sumar(rayo,&menos_dos_anterior);
 }
-/**
- * Devuelve el vector reflejado rayo respecto a la normal dados los indices de refraccion n1 y n2
- * Copiado de un documento de la universidad de Standford
- */
+//Devuelve el vector reflejado rayo respecto a la normal dados los indices de refraccion n1 y n2
+//Basado en un documento de la universidad de Standford
 Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2){
     Vector incidente = Vector::productoEscalar(rayo, -1);
     double n = n1/n2;
@@ -361,13 +354,6 @@ int main(int argc, char* argv[]) {
             j=j+TAM_PIXEL;
             nIteracion++;
 
-            if(nIteracion==20550){
-                nIteracion++;
-            }
-            if(i < ALTO_PANTALLA/2.0 - TAM_PIXEL*200){
-                i=i+0;
-            }
-
             // Calculamos la direccion al centro(+TAM_PIXEL/2) pixel correspondiente
             Vector d(TAM_PIXEL/2 + (float)j, TAM_PIXEL/2 + (float)i, DISTANCIA_PANTALLA);
             d.normalizar();
@@ -387,28 +373,25 @@ int main(int argc, char* argv[]) {
                 //Se lanzan rayos secundarios
                 Vector desplazamiento = Vector::productoEscalar(&d, punto_mas_cercano);
                 Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
-                float intensidad[3] = {0.0, 0.0, 0.0};
+                float intensidad[3] = {0.0,0.0,0.0};
                 lanzar_secundarios(camara.getP(), sig_origen, 0, mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
 
-                for (int k = 0; k < num_esferas; k++) {
-                    if (mas_cercana == k) {
-
-                        if(intensidad[0]>max_color){
-                            max_color = intensidad[0];
-                        }
-                        if(intensidad[1]>max_color){
-                            max_color = intensidad[1];
-                        }
-                        if(intensidad[2]>max_color){
-                            max_color = intensidad[2];
-                        }
-                        buffer[ind2][ind][0] = intensidad[0];
-                        buffer[ind2][ind][1] = intensidad[1];
-                        buffer[ind2][ind][2] = intensidad[2];
-                    }
+                if(intensidad[0]>max_color){
+                    max_color = intensidad[0];
                 }
+                if(intensidad[1]>max_color){
+                    max_color = intensidad[1];
+                }
+                if(intensidad[2]>max_color){
+                    max_color = intensidad[2];
+                }
+
+                buffer[ind2][ind][0] = intensidad[0];
+                buffer[ind2][ind][1] = intensidad[1];
+                buffer[ind2][ind][2] = intensidad[2];
             }
         }
+
         cout << (float)nIteracion/(float)max_iteraciones * 100 <<"%\n";
     }
 

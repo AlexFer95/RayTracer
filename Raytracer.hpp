@@ -24,27 +24,34 @@ const float DISTANCIA_PANTALLA = 0.5;
 const float ANCHO_PANTALLA = 1;
 const float ALTO_PANTALLA = 1;
 const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
-const int MAX_RAYOS = 16;
+const int MAX_RAYOS = 32;
 const int MAX_REBOTES_IND = 1;
+
+//COLORES
+const float amarillo[3] = { 1.0 , 1.0 , 0.1 };
+const float azul[3] = { 0.1 , 1.0 , 1.0 };
+const float azul2[3] = { 0.1 , 0.1 , 1.0 };
+const float morado[3] = { 1.0 , 0.1 , 1.0 };
+const float negro[3] = { 0.0 , 0.0 , 0.0 };
+const float rojo[3] = { 1.0 , 0.1 , 0.1 };
+const float verde[3] = { 0.1 , 1.0 , 0.1 };
+const float gris[3] = { 0.5 , 0.5 , 0.5};
 
 //VARIABLES DEL TRAZADOR
 float*** buffer;
+
 std::default_random_engine generator;
 std::uniform_real_distribution<float> distribution(0.0,1.0);
+
 FuenteLuz *lista_luces[20];
 Esfera *lista_esferas[20];
 int num_luces;
 int num_esferas;
 
 Punto origen(0, 0, 0); //Origen del sistema
-Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0)); //camara(matriz)
-/*//Definir fuentes de luz
-FuenteLuz f0(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*8, camara.getPref()->getY()+DISTANCIA_PANTALLA*4, DISTANCIA_PANTALLA*8), 2000);
-FuenteLuz f1(Punto(camara.getPref()->getX()-DISTANCIA_PANTALLA*8, camara.getPref()->getY()+DISTANCIA_PANTALLA*4, DISTANCIA_PANTALLA*8), 2000);
-int num_luces = 2;
-FuenteLuz *lista_luces[] = {&f0,&f1};*/
+Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0));
 
-//Definir objetos de la escena
+//Definir materiales para las escenas
 Material p_azul = { azul , 0.0 , 0.0 , 0.1 , Phong};
 Material p_amar = { amarillo , 0.0 , 0.0 , 0.1 , Phong};
 Material p_mora = { morado , 0.0 , 0.0 , 0.1 , Phong};
@@ -63,29 +70,19 @@ Esfera cv_roof(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.
 Esfera cv_back(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + 1001), 1000, p_gris);
 FuenteLuz f0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ()), 2000);
 
-
-
-/*Esfera suelo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
-Esfera techo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*-1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_mora);
-Esfera fondo(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*1020), DISTANCIA_PANTALLA*1000, p_amar);
-Esfera frente(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*-1010), DISTANCIA_PANTALLA*1000, p_amar);
-Esfera izquierda(Punto(camara.getPref()->getX() + DISTANCIA_PANTALLA*-1010, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_mora);
-Esfera derecha(Punto(camara.getPref()->getX() + DISTANCIA_PANTALLA*1010, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_mora);
-Esfera e0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA/2, p_rojo);
-Esfera e1(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*4, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA*2, p_azul);
-Esfera e2(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*-4, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA*2, p_amar);
-int num_esferas = 7;
-Esfera *lista_esferas[] = {&suelo,&techo,&fondo,&frente,&izquierda,&derecha,&e0/*,&e1,&e2};*/
-
+//PROTOTIPOS DE LAS FUNCIONES
+void cargar_escena(int escena);
+Matriz calcular_locales(Vector normal, Punto posicion);
 void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr);
+void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr, Vector omega_o, int esfera, int rebotes);
 Vector calcular_reflejado(Vector* rayo, Vector* normal);
+Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2);
 float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia);
 void colisionRayoObjetos(Rayo* r, int* i, float* j);
 void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
+void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 
-Matriz calcular_locales(Vector normal, Punto posicion);
-void cambiar_coord_escena(Esfera esferasLocales[], FuenteLuz lucesLocales[], Matriz T);
-void reestablecer_globales();
+
 #endif //RAYTRACER_RAYTRACER_H
