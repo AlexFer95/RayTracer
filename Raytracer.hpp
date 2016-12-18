@@ -17,7 +17,7 @@
 #define NUM_ESCENAS 1
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
-const int ANCHO_IMAGEN = 250;
+const int ANCHO_IMAGEN = 200;
 const int ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
 const float DISTANCIA_PANTALLA = 0.5;
@@ -28,14 +28,15 @@ const int MAX_RAYOS = 32;
 const int MAX_REBOTES_IND = 1;
 
 //COLORES
-const float amarillo[3] = { 1.0 , 1.0 , 0.1 };
-const float azul[3] = { 0.1 , 1.0 , 1.0 };
-const float azul2[3] = { 0.1 , 0.1 , 1.0 };
-const float morado[3] = { 1.0 , 0.1 , 1.0 };
+const float amarillo[3] = { 0.4 , 0.4 , 0.2 };
+const float azul[3] = { 0.2 , 0.4 , 0.4 };
+const float azul2[3] = { 0.1 , 0.1 , 0.8 };
+const float morado[3] = { 0.4 , 0.2 , 0.4 };
 const float negro[3] = { 0.0 , 0.0 , 0.0 };
-const float rojo[3] = { 1.0 , 0.1 , 0.1 };
-const float verde[3] = { 0.1 , 1.0 , 0.1 };
-const float gris[3] = { 0.5 , 0.5 , 0.5};
+const float rojo[3] = { 0.8 , 0.1 , 0.1 };
+const float verde[3] = { 0.1 , 0.8 , 0.1 };
+const float gris[3] = { 0.3 , 0.3 , 0.3};
+const float blanco[3] = {1.0 , 1.0 , 1.0};
 
 //VARIABLES DEL TRAZADOR
 float*** buffer;
@@ -52,23 +53,25 @@ Punto origen(0, 0, 0); //Origen del sistema
 Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0));
 
 //Definir materiales para las escenas
-Material p_azul = { azul , 0.0 , 0.0 , 0.1 , Phong};
-Material p_amar = { amarillo , 0.0 , 0.0 , 0.1 , Phong};
-Material p_mora = { morado , 0.0 , 0.0 , 0.1 , Phong};
-Material p_rojo = { rojo , 0.1 , 0.0 , 0.1 , Phong};
-Material p_azul2 = { azul2 , 0.0 , 0.0 , 0.1 , Phong};
-Material p_verde = { verde , 0.1 , 0.0 , 0.1 , Phong};
-Material p_gris = { gris , 0.1 , 0.0 , 0.1 , Phong};
-Material reflex = { negro , 0.0 , 0.0 , 0.1 , Reflexion};
-Material refrac = { negro , 0.0 , 1.6 , 0.1 , Refraccion};
+Material p_azul = { azul , 0.0 , 0.0 , Phong};
+Material p_amar = { amarillo , 0.0 , 0.0 , Phong};
+Material p_mora = { morado , 0.0 , 0.0 , Phong};
+Material p_rojo = { rojo , 0.0 , 0.0 , Phong};
+Material p_azul2 = { azul2 , 0.0 , 0.0 , Phong};
+Material p_verde = { verde , 0.0 , 0.0 , Phong};
+Material p_gris = { gris , 0.0 , 0.0 , Phong};
+Material reflex = { blanco , 0.0 , 0.0 , Reflexion};
+Material refrac = { blanco , 1.0 , 1.0 , Refraccion};
 
 //ESCENA 1: CORNELL BOX (1x1)
-Esfera cv_left(Punto(camara.getPref()->getX() - 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + 0.5), 1000, p_rojo);
-Esfera cv_right(Punto(camara.getPref()->getX() + 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + 0.5), 1000, p_verde);
-Esfera cv_floor(Punto(camara.getPref()->getX() , camara.getPref()->getY() - 1000.5, camara.getPref()->getZ() + 0.5), 1000, p_gris);
-Esfera cv_roof(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.5, camara.getPref()->getZ() + 0.5), 1000, p_gris);
-Esfera cv_back(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + 1001), 1000, p_gris);
-FuenteLuz f0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ()), 2000);
+Esfera cv_left(Punto(camara.getPref()->getX() - 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_rojo);
+Esfera cv_right(Punto(camara.getPref()->getX() + 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_verde);
+Esfera cv_floor(Punto(camara.getPref()->getX() , camara.getPref()->getY() - 1000.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_gris);
+Esfera cv_roof(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_gris);
+Esfera cv_back(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 1001), 1000, p_gris);
+Esfera cv_spe(Punto(camara.getPref()->getX() - 0.15, camara.getPref()->getY() - 0.25, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.7), 0.25, reflex);
+Esfera cv_ref(Punto(camara.getPref()->getX() + 0.3, camara.getPref()->getY() - 0.35, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 0.15, refrac);
+FuenteLuz f0(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.2), 200);
 
 //PROTOTIPOS DE LAS FUNCIONES
 void cargar_escena(int escena);

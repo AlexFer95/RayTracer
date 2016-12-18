@@ -17,12 +17,14 @@ void cargar_escena(int escena){
     switch(escena){
         case 1:
             num_luces = 1;
-            num_esferas = 5;
+            num_esferas = 7;
             lista_esferas[0] = &cv_left;
             lista_esferas[1] = &cv_right;
             lista_esferas[2] = &cv_floor;
             lista_esferas[3] = &cv_roof;
             lista_esferas[4] = &cv_back;
+            lista_esferas[5] = &cv_spe;
+            lista_esferas[6] = &cv_ref;
             lista_luces[0] = &f0;
             break;
     }
@@ -60,7 +62,7 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
 }
 
 //Calcula la iluminación indirecta por montecarlo
-void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, float* fr, Vector omega_o, int esfera, int rebotes){
+void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, float* fr, Vector omega_o, int esfera, int rebotes, int rebotesInd){
 
     Matriz T = calcular_locales(normal, interseccion);
 
@@ -85,7 +87,7 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
             //Se lanzan rayos secundarios
             Vector desplazamiento = Vector::productoEscalar(&omega_i, punto_mas_cercano);
             Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-            lanzar_secundarios(interseccion, sig_origen, /*dist_acum +*/ desplazamiento.modulo(), mas_cercana, rebotes, 0, intensidad);
+            lanzar_secundarios(interseccion, sig_origen, dist_acum + desplazamiento.modulo(), mas_cercana, rebotes, --rebotesInd, intensidad);
         }
         float intensidad_brdf[3] = {0.0, 0.0, 0.0};
         brdf(&omega_i, &omega_o, esfera, intensidad_brdf);
@@ -234,10 +236,10 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
 
     if(rebotesIndirectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-        iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, omega_r, ultima, rebotes);
-        intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
-        intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
-        intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
+        iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
+        intensidad[0] = intensidad[0] + luzIndirecta[0]*0;//*0.1;
+        intensidad[1] = intensidad[1] + luzIndirecta[1]*0;//*0.1;
+        intensidad[2] = intensidad[2] + luzIndirecta[2]*0;//*0.1;
     }
 
 }

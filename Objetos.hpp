@@ -17,7 +17,6 @@ struct Material{
 	const float* kd;
 	float ks;
 	float kr;
-    float absorcion;
 	Superficie s;
 };
 
