@@ -441,7 +441,7 @@ void cambiar_coord_escena(Esfera esferasLocales[], FuenteLuz lucesLocales[], Mat
     }
 }
 
-void reestablecer_globales(){
+/*void reestablecer_globales(){
     lista_esferas[0] = &suelo;
     lista_esferas[1] = &techo;
     lista_esferas[2] = &fondo;
@@ -454,4 +454,4 @@ void reestablecer_globales(){
 
     lista_luces[0] = &f0;
     lista_luces[1] = &f1;
-}
+}*/

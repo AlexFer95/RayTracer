@@ -19,9 +19,9 @@
 const int ANCHO_IMAGEN = 250;
 const int ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
-const float DISTANCIA_PANTALLA = 0.1;
-const float ANCHO_PANTALLA = 2*tan(30*PI/180)*DISTANCIA_PANTALLA;
-const float ALTO_PANTALLA = ANCHO_PANTALLA;
+const float DISTANCIA_PANTALLA = 0.5;
+const float ANCHO_PANTALLA = 1;
+const float ALTO_PANTALLA = 1;
 const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
 const int MAX_RAYOS = 16;
 const int MAX_REBOTES_IND = 1;
@@ -31,11 +31,11 @@ float*** buffer;
 
 Punto origen(0, 0, 0); //Origen del sistema
 Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0)); //camara(matriz)
-//Definir fuentes de luz
+/*//Definir fuentes de luz
 FuenteLuz f0(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*8, camara.getPref()->getY()+DISTANCIA_PANTALLA*4, DISTANCIA_PANTALLA*8), 2000);
 FuenteLuz f1(Punto(camara.getPref()->getX()-DISTANCIA_PANTALLA*8, camara.getPref()->getY()+DISTANCIA_PANTALLA*4, DISTANCIA_PANTALLA*8), 2000);
 int num_luces = 2;
-FuenteLuz *lista_luces[] = {&f0,&f1};
+FuenteLuz *lista_luces[] = {&f0,&f1};*/
 
 //Definir objetos de la escena
 Material p_azul = { azul , 0.0 , 0.0 , 0.1 , Phong};
@@ -43,10 +43,25 @@ Material p_amar = { amarillo , 0.0 , 0.0 , 0.1 , Phong};
 Material p_mora = { morado , 0.0 , 0.0 , 0.1 , Phong};
 Material p_rojo = { rojo , 0.1 , 0.0 , 0.1 , Phong};
 Material p_azul2 = { azul2 , 0.0 , 0.0 , 0.1 , Phong};
+Material p_verde = { verde , 0.1 , 0.0 , 0.1 , Phong};
+Material p_gris = { gris , 0.1 , 0.0 , 0.1 , Phong};
 Material reflex = { negro , 0.0 , 0.0 , 0.1 , Reflexion};
 Material refrac = { negro , 0.0 , 1.6 , 0.1 , Refraccion};
 
-Esfera suelo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
+//CORNELL BOX (1x1)
+Esfera cv_left(Punto(camara.getPref()->getX() - 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + 0.5), 1000, p_rojo);
+Esfera cv_right(Punto(camara.getPref()->getX() + 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + 0.5), 1000, p_verde);
+Esfera cv_floor(Punto(camara.getPref()->getX() , camara.getPref()->getY() - 1000.5, camara.getPref()->getZ() + 0.5), 1000, p_gris);
+Esfera cv_roof(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.5, camara.getPref()->getZ() + 0.5), 1000, p_gris);
+Esfera cv_back(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + 1001), 1000, p_gris);
+int num_esferas = 5;
+Esfera *lista_esferas[] = {&cv_left,&cv_right,&cv_floor,&cv_roof,&cv_back};
+FuenteLuz f0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ()), 2000);
+int num_luces = 1;
+FuenteLuz *lista_luces[] = {&f0};
+
+
+/*Esfera suelo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);
 Esfera techo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*-1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_mora);
 Esfera fondo(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*1020), DISTANCIA_PANTALLA*1000, p_amar);
 Esfera frente(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*-1010), DISTANCIA_PANTALLA*1000, p_amar);
@@ -56,7 +71,7 @@ Esfera e0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPr
 Esfera e1(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*4, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA*2, p_azul);
 Esfera e2(Punto(camara.getPref()->getX()+DISTANCIA_PANTALLA*-4, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA*12), DISTANCIA_PANTALLA*2, p_amar);
 int num_esferas = 7;
-Esfera *lista_esferas[] = {&suelo,&techo,&fondo,&frente,&izquierda,&derecha,&e0/*,&e1,&e2*/};
+Esfera *lista_esferas[] = {&suelo,&techo,&fondo,&frente,&izquierda,&derecha,&e0/*,&e1,&e2};*/
 
 void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr);
 Vector calcular_reflejado(Vector* rayo, Vector* normal);
