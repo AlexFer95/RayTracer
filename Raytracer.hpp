@@ -14,6 +14,7 @@
 #define ALPHA 70
 #define MAX_REBOTES 4
 #define EPSILON 0.001
+#define NUM_ESCENAS 1
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
 const int ANCHO_IMAGEN = 250;
@@ -28,6 +29,12 @@ const int MAX_REBOTES_IND = 1;
 
 //VARIABLES DEL TRAZADOR
 float*** buffer;
+std::default_random_engine generator;
+std::uniform_real_distribution<float> distribution(0.0,1.0);
+FuenteLuz *lista_luces[20];
+Esfera *lista_esferas[20];
+int num_luces;
+int num_esferas;
 
 Punto origen(0, 0, 0); //Origen del sistema
 Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0)); //camara(matriz)
@@ -48,17 +55,14 @@ Material p_gris = { gris , 0.1 , 0.0 , 0.1 , Phong};
 Material reflex = { negro , 0.0 , 0.0 , 0.1 , Reflexion};
 Material refrac = { negro , 0.0 , 1.6 , 0.1 , Refraccion};
 
-//CORNELL BOX (1x1)
+//ESCENA 1: CORNELL BOX (1x1)
 Esfera cv_left(Punto(camara.getPref()->getX() - 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + 0.5), 1000, p_rojo);
 Esfera cv_right(Punto(camara.getPref()->getX() + 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + 0.5), 1000, p_verde);
 Esfera cv_floor(Punto(camara.getPref()->getX() , camara.getPref()->getY() - 1000.5, camara.getPref()->getZ() + 0.5), 1000, p_gris);
 Esfera cv_roof(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.5, camara.getPref()->getZ() + 0.5), 1000, p_gris);
 Esfera cv_back(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + 1001), 1000, p_gris);
-int num_esferas = 5;
-Esfera *lista_esferas[] = {&cv_left,&cv_right,&cv_floor,&cv_roof,&cv_back};
 FuenteLuz f0(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ()), 2000);
-int num_luces = 1;
-FuenteLuz *lista_luces[] = {&f0};
+
 
 
 /*Esfera suelo(Punto(camara.getPref()->getX(), camara.getPref()->getY() + DISTANCIA_PANTALLA*1005, camara.getPref()->getZ() + DISTANCIA_PANTALLA*20), DISTANCIA_PANTALLA*1000, p_azul);

@@ -11,9 +11,41 @@
 
 using namespace std;
 
-std::default_random_engine generator;
-std::uniform_real_distribution<float> distribution(0.0,1.0);
+
+
 //FUNCIONES Y METODOS
+
+void cargar_escena(int escena){
+    switch(escena){
+        case 1:
+            num_luces = 1;
+            num_esferas = 5;
+            lista_esferas[0] = &cv_left;
+            lista_esferas[1] = &cv_right;
+            lista_esferas[2] = &cv_floor;
+            lista_esferas[3] = &cv_roof;
+            lista_esferas[4] = &cv_back;
+            lista_luces[0] = &f0;
+            break;
+    }
+}
+
+Matriz calcular_locales(Vector normal, Punto posicion){
+    Vector cualquiera = Vector(1,0,0);
+    Vector u = Vector::pVectorial(&normal,&cualquiera);
+    if(u.modulo()==0){
+        cualquiera = Vector(0,1,0);
+        u = Vector::pVectorial(&normal,&cualquiera);
+        if(u.modulo()==0){
+            cualquiera = Vector(0,0,1);
+            u = Vector::pVectorial(&normal,&cualquiera);
+        }
+    }
+    Vector v = Vector::pVectorial(&normal,&u);
+
+    return  Matriz(u, v, normal, posicion);
+}
+
 //Calcula la luz siguiendo la brdf de phong dados el vector incidente, el reflejado y la esfera con la que se ha intersectado
 void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
 
@@ -36,17 +68,8 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
 
 
     Matriz T = calcular_locales(normal, interseccion);
-    Matriz T_inversa = T.invertir();
-    Esfera esfLocales[num_esferas];
-    FuenteLuz flLocales[num_luces];
-    /*cambiar_coord_escena(esfLocales,flLocales,T_inversa);
-    interseccion = Punto(0,0,0);*/
 
     for(int i=0 ; i<MAX_RAYOS ; i++){
-
-        //Generar numero aleatorio para theta y phi [0,1)
-        //float th01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        //float ph01 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
         float th01 = distribution(generator);
         float ph01 = distribution(generator);
@@ -95,9 +118,8 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
     fr[0] /= MAX_RAYOS;
     fr[1] /= MAX_RAYOS;
     fr[2] /= MAX_RAYOS;
-
-    //reestablecer_globales();
 }
+
 //Calcula el vector reflejado dado el vector de un rayo y la normal respecto a la que se quiere reflejar
 Vector calcular_reflejado(Vector* rayo, Vector* normal){
     float omega_i_normal = Vector::pEscalar(rayo,normal);
@@ -301,9 +323,20 @@ void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int u
 }
 
 
-int main() {
+int main(int argc, char* argv[]) {
 
-    //srand(time(NULL));
+    if(argc != 2){
+        cout << "Uso: ./RayTracer [num_escena]" << endl;
+        return -1;
+    }
+
+    int escena = atoi(argv[1]);
+    if(escena<1 || escena>NUM_ESCENAS){
+        cout << "[num_escena] debe estar comprendido entre 1 y " << NUM_ESCENAS << endl;
+        return -1;
+    }
+
+    cargar_escena(escena);
 
     //Creamos el buffer
     buffer = new float**[ANCHO_IMAGEN];
@@ -413,45 +446,4 @@ int main() {
     return 0;
 }
 
-Matriz calcular_locales(Vector normal, Punto posicion){
-    Vector cualquiera = Vector(1,0,0);
-    Vector u = Vector::pVectorial(&normal,&cualquiera);
-    if(u.modulo()==0){
-        cualquiera = Vector(0,1,0);
-        u = Vector::pVectorial(&normal,&cualquiera);
-        if(u.modulo()==0){
-            cualquiera = Vector(0,0,1);
-            u = Vector::pVectorial(&normal,&cualquiera);
-        }
-    }
-    Vector v = Vector::pVectorial(&normal,&u);
 
-    return  Matriz(u, v, normal, posicion);
-}
-
-void cambiar_coord_escena(Esfera esferasLocales[], FuenteLuz lucesLocales[], Matriz T){
-    for(int i = 0; i < num_esferas; i++){
-        esferasLocales[i] = lista_esferas[i]->transformar(T);;
-        lista_esferas[i] = &esferasLocales[i];
-    }
-
-    for(int i = 0; i < num_luces; i++){
-        lucesLocales[i] = lista_luces[i]->transformar(T);
-        lista_luces[i] = &lucesLocales[i];
-    }
-}
-
-/*void reestablecer_globales(){
-    lista_esferas[0] = &suelo;
-    lista_esferas[1] = &techo;
-    lista_esferas[2] = &fondo;
-    lista_esferas[3] = &frente;
-    lista_esferas[4] = &izquierda;
-    lista_esferas[5] = &derecha;
-    lista_esferas[6] = &e0;
-    lista_esferas[7] = &e1;
-    lista_esferas[8] = &e2;
-
-    lista_luces[0] = &f0;
-    lista_luces[1] = &f1;
-}*/
