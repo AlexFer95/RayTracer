@@ -13,7 +13,9 @@
 #define PI 3.14159
 #define ALPHA 70
 #define MAX_REBOTES 4
-#define EPSILON 0.001
+#define MAX_RAYOS 16
+#define MAX_REBOTES_IND 1
+#define EPSILON 0.0001
 #define NUM_ESCENAS 1
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
@@ -24,8 +26,7 @@ const float DISTANCIA_PANTALLA = 0.5;
 const float ANCHO_PANTALLA = 1;
 const float ALTO_PANTALLA = 1;
 const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
-const int MAX_RAYOS = 32;
-const int MAX_REBOTES_IND = 1;
+
 
 //COLORES
 const float amarillo[3] = { 0.4 , 0.4 , 0.2 };
@@ -61,7 +62,7 @@ Material p_azul2 = { azul2 , 0.0 , 0.0 , Phong};
 Material p_verde = { verde , 0.0 , 0.0 , Phong};
 Material p_gris = { gris , 0.0 , 0.0 , Phong};
 Material reflex = { blanco , 0.0 , 0.0 , Reflexion};
-Material refrac = { blanco , 1.0 , 1.0 , Refraccion};
+Material refrac = { blanco , 0.0 , 1.4 , Refraccion};
 
 //ESCENA 1: CORNELL BOX (1x1)
 Esfera cv_left(Punto(camara.getPref()->getX() - 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_rojo);
@@ -71,7 +72,7 @@ Esfera cv_roof(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.
 Esfera cv_back(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 1001), 1000, p_gris);
 Esfera cv_spe(Punto(camara.getPref()->getX() - 0.15, camara.getPref()->getY() - 0.25, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.7), 0.25, reflex);
 Esfera cv_ref(Punto(camara.getPref()->getX() + 0.3, camara.getPref()->getY() - 0.35, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 0.15, refrac);
-FuenteLuz f0(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.2), 200);
+FuenteLuz f0(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.3), 400);
 
 //PROTOTIPOS DE LAS FUNCIONES
 void cargar_escena(int escena);

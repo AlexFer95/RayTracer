@@ -42,7 +42,9 @@ Matriz calcular_locales(Vector normal, Punto posicion){
             u = Vector::pVectorial(&normal,&cualquiera);
         }
     }
+    u.normalizar();
     Vector v = Vector::pVectorial(&normal,&u);
+    v.normalizar();
 
     return  Matriz(u, v, normal, posicion);
 }
@@ -77,17 +79,18 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
         //Lanzar rayo
         Vector v = Vector(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
         Vector omega_i = T.transformar(&v);
+        omega_i.normalizar();
         Rayo rIndirecto(interseccion, omega_i);
 
         int mas_cercana;           //Indice de la esfera mas cercana
-        float punto_mas_cercano ; //Distancia a la que se encuentra el punto de interseccion
+        float punto_mas_cercano; //Distancia a la que se encuentra el punto de interseccion
         colisionRayoObjetos(&rIndirecto, &mas_cercana, &punto_mas_cercano); // Esfera con la que colisiona el rayo
         float intensidad[3] = {0.0, 0.0, 0.0};
         if (mas_cercana != -1) { //Si no ha intersectado con nada -> NEGRO
             //Se lanzan rayos secundarios
             Vector desplazamiento = Vector::productoEscalar(&omega_i, punto_mas_cercano);
             Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-            lanzar_secundarios(interseccion, sig_origen, dist_acum + desplazamiento.modulo(), mas_cercana, rebotes, --rebotesInd, intensidad);
+            lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo(), mas_cercana, rebotes, --rebotesInd, intensidad);
         }
         float intensidad_brdf[3] = {0.0, 0.0, 0.0};
         brdf(&omega_i, &omega_o, esfera, intensidad_brdf);
@@ -108,9 +111,6 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
         fr[1] += intensidad[1];
         fr[2] += intensidad[2];
 
-        if(((int)fr[0])<0){
-            fr[0]=0;
-        }
     }
     fr[0] /= MAX_RAYOS;
     fr[1] /= MAX_RAYOS;
@@ -151,10 +151,10 @@ float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia){
         float soluciones[2];
         lista_esferas[j]->intersectar(r, soluciones);
 
-        if (isfinite(soluciones[0]) && soluciones[0]>EPSILON && soluciones[0]<distancia) {
+        if (isfinite(soluciones[0]) && soluciones[0]>0 && soluciones[0]<distancia && soluciones[0]>EPSILON) {
             directa = false;
         }
-        if (isfinite(soluciones[1]) && soluciones[1]>EPSILON && soluciones[0]<distancia) {
+        if (isfinite(soluciones[1]) && soluciones[1]>0 && soluciones[0]<distancia && soluciones[1]>EPSILON) {
             directa = false;
         }
     }
@@ -237,9 +237,9 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
     if(rebotesIndirectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
         iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
-        intensidad[0] = intensidad[0] + luzIndirecta[0]*0;//*0.1;
-        intensidad[1] = intensidad[1] + luzIndirecta[1]*0;//*0.1;
-        intensidad[2] = intensidad[2] + luzIndirecta[2]*0;//*0.1;
+        intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
+        intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
+        intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
     }
 
 }
