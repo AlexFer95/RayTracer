@@ -44,6 +44,8 @@ Matriz calcular_locales(Vector normal, Punto posicion){
     }
     Vector v = Vector::pVectorial(&normal,&u);
 
+    u.normalizar();
+    v.normalizar();
     return  Matriz(u, v, normal, posicion);
 }
 
@@ -76,7 +78,9 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
 
         //Lanzar rayo
         Vector v = Vector(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+        //v.normalizar();
         Vector omega_i = T.transformar(&v);
+        omega_i.normalizar();
         Rayo rIndirecto(interseccion, omega_i);
 
         int mas_cercana;           //Indice de la esfera mas cercana
@@ -87,7 +91,7 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
             //Se lanzan rayos secundarios
             Vector desplazamiento = Vector::productoEscalar(&omega_i, punto_mas_cercano);
             Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-            lanzar_secundarios(interseccion, sig_origen, dist_acum + desplazamiento.modulo(), mas_cercana, rebotes, --rebotesInd, intensidad);
+            lanzar_secundarios(interseccion, sig_origen, /*dist_acum + desplazamiento.modulo()*/0, mas_cercana, rebotes, rebotesInd-1, intensidad);
         }
         float intensidad_brdf[3] = {0.0, 0.0, 0.0};
         brdf(&omega_i, &omega_o, esfera, intensidad_brdf);
@@ -237,9 +241,9 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
     if(rebotesIndirectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
         iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
-        intensidad[0] = intensidad[0] + luzIndirecta[0]*0;//*0.1;
-        intensidad[1] = intensidad[1] + luzIndirecta[1]*0;//*0.1;
-        intensidad[2] = intensidad[2] + luzIndirecta[2]*0;//*0.1;
+        intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
+        intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
+        intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
     }
 
 }
@@ -265,7 +269,7 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_secundarios(interseccion, sig_origen, /*desplazamiento.modulo() +*/ dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
 void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
@@ -297,7 +301,7 @@ void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, 
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_secundarios(interseccion, sig_origen, /*desplazamiento.modulo() + */dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
 //Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
@@ -319,7 +323,7 @@ void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int u
 
 
 int main(int argc, char* argv[]) {
-
+/*
     if(argc != 2){
         cout << "Uso: ./RayTracer [num_escena]" << endl;
         return -1;
@@ -329,7 +333,8 @@ int main(int argc, char* argv[]) {
     if(escena<1 || escena>NUM_ESCENAS){
         cout << "[num_escena] debe estar comprendido entre 1 y " << NUM_ESCENAS << endl;
         return -1;
-    }
+    }*/
+    int escena = 1;
 
     cargar_escena(escena);
 
@@ -355,7 +360,9 @@ int main(int argc, char* argv[]) {
         for (int ind2 = 0; ind2<ANCHO_IMAGEN ; ind2++) {
             j=j+TAM_PIXEL;
             nIteracion++;
-
+            if(nIteracion == 119*200+60){
+                nIteracion++;
+            }
             // Calculamos la direccion al centro(+TAM_PIXEL/2) pixel correspondiente
             Vector d(TAM_PIXEL/2 + (float)j, TAM_PIXEL/2 + (float)i, DISTANCIA_PANTALLA);
             d.normalizar();
@@ -376,8 +383,10 @@ int main(int argc, char* argv[]) {
                 Vector desplazamiento = Vector::productoEscalar(&d, punto_mas_cercano);
                 Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
                 float intensidad[3] = {0.0,0.0,0.0};
-                lanzar_secundarios(camara.getP(), sig_origen, 0, mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
-
+                lanzar_secundarios(camara.getP(), sig_origen, /*desplazamiento.modulo()*/ 0, mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
+                if(intensidad[1] == 0){
+                    intensidad[1]=0;
+                }
                 if(intensidad[0]>max_color){
                     max_color = intensidad[0];
                 }
