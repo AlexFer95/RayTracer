@@ -83,7 +83,7 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
         Rayo rIndirecto(interseccion, omega_i);
 
         int mas_cercana;           //Indice de la esfera mas cercana
-        float punto_mas_cercano; //Distancia a la que se encuentra el punto de interseccion
+        float punto_mas_cercano ; //Distancia a la que se encuentra el punto de interseccion
         colisionRayoObjetos(&rIndirecto, &mas_cercana, &punto_mas_cercano); // Esfera con la que colisiona el rayo
         float intensidad[3] = {0.0, 0.0, 0.0};
         if (mas_cercana != -1) { //Si no ha intersectado con nada -> NEGRO
@@ -265,7 +265,7 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_secundarios(interseccion, sig_origen, /*desplazamiento.modulo() +*/ dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
 void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
@@ -297,7 +297,7 @@ void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, 
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_secundarios(interseccion, sig_origen, /*desplazamiento.modulo() + */dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
 //Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
