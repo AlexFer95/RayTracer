@@ -64,7 +64,7 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
 }
 
 //Calcula la iluminación indirecta por montecarlo
-void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, float* fr, Vector omega_o, int esfera, int rebotes, int rebotesInd){
+void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr, Vector omega_o, int esfera, int rebotes, int rebotesInd){
 
     Matriz T = calcular_locales(normal, interseccion);
 
@@ -83,18 +83,18 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float dist_acum, f
         Rayo rIndirecto(interseccion, omega_i);
 
         int mas_cercana;           //Indice de la esfera mas cercana
-        float punto_mas_cercano ; //Distancia a la que se encuentra el punto de interseccion
+        float punto_mas_cercano; //Distancia a la que se encuentra el punto de interseccion
         colisionRayoObjetos(&rIndirecto, &mas_cercana, &punto_mas_cercano); // Esfera con la que colisiona el rayo
         float intensidad[3] = {0.0, 0.0, 0.0};
         if (mas_cercana != -1) { //Si no ha intersectado con nada -> NEGRO
             //Se lanzan rayos secundarios
             Vector desplazamiento = Vector::productoEscalar(&omega_i, punto_mas_cercano);
             Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-            lanzar_secundarios(interseccion, sig_origen, desplazamiento.modulo(), mas_cercana, rebotes, --rebotesInd, intensidad);
+            lanzar_rayos(interseccion, sig_origen, desplazamiento.modulo(), mas_cercana, rebotes, --rebotesInd, intensidad);
         }
         float intensidad_brdf[3] = {0.0, 0.0, 0.0};
         brdf(&omega_i, &omega_o, esfera, intensidad_brdf);
-        float valor = abs(cos(theta))*abs(sin(theta));
+        float valor = cos(theta)*sin(theta);
         intensidad[0] *= intensidad_brdf[0]*valor;
         intensidad[1] *= intensidad_brdf[1]*valor;
         intensidad[2] *= intensidad_brdf[2]*valor;
@@ -126,6 +126,7 @@ Vector calcular_reflejado(Vector* rayo, Vector* normal){
     Vector menos_dos_anterior = Vector::productoEscalar(&previo_mas_anterior, -2);
     return Vector::sumar(rayo,&menos_dos_anterior);
 }
+
 //Devuelve el vector reflejado rayo respecto a la normal dados los indices de refraccion n1 y n2
 //Basado en un documento de la universidad de Standford
 Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2){
@@ -142,31 +143,31 @@ Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2){
     Vector refractado = Vector::sumar(&v1,&v2);
     return refractado;
 }
+
 //Calcula la iluminacion directa que llega a un punto(rayos de luz/sombra)
 float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia){
-    bool directa = true;                                   //Indice de la esfera mas cercana
+    bool directa = true;
 
     //Se calculan las intersecciones con las esferas
     for (int j=0 ; j<num_esferas && directa ; j++) {
         float soluciones[2];
         lista_esferas[j]->intersectar(r, soluciones);
 
-        if (isfinite(soluciones[0]) && soluciones[0]>0 && soluciones[0]<distancia && soluciones[0]>EPSILON) {
+        if (isfinite(soluciones[0]) && soluciones[0]<distancia && soluciones[0]>EPSILON) {
             directa = false;
         }
-        if (isfinite(soluciones[1]) && soluciones[1]>0 && soluciones[0]<distancia && soluciones[1]>EPSILON) {
+        if (isfinite(soluciones[1]) && soluciones[1]<distancia && soluciones[1]>EPSILON) {
             directa = false;
         }
     }
 
     if(directa) {
-        float int_relativa = lista_luces[num_luz]->getEnergia() / ((dist_acum+distancia)*(dist_acum+distancia));
-        if (int_relativa > 0.0) { // Si llega suficiente luz
-            return int_relativa;
-        }
+        return  lista_luces[num_luz]->getEnergia() / ((dist_acum+distancia)*(dist_acum+distancia));
     }
+
     return 0.0;
 }
+
 /**
  * Devuelve el indice de la esfera de la escena con la que colosiona el rayo
  * @param r
@@ -180,11 +181,11 @@ void colisionRayoObjetos(Rayo* r, int* i, float* j){
         float soluciones[2];
         lista_esferas[k]->intersectar(r, soluciones);
 
-        if (isfinite(soluciones[0]) && soluciones[0] > 0 && soluciones[0] < punto_mas_cercano && soluciones[0] > EPSILON) {
+        if (isfinite(soluciones[0]) && soluciones[0] < punto_mas_cercano && soluciones[0] > EPSILON) {
             mas_cercana = k;
             punto_mas_cercano = soluciones[0];
         }
-        if (isfinite(soluciones[1]) && soluciones[1] > 0 && soluciones[1] < punto_mas_cercano && soluciones[1] > EPSILON) {
+        if (isfinite(soluciones[1]) && soluciones[1] < punto_mas_cercano && soluciones[1] > EPSILON) {
             mas_cercana = k;
             punto_mas_cercano = soluciones[1];
         }
@@ -236,7 +237,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
 
     if(rebotesIndirectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-        iluminacion_indirecta(interseccion,normal, dist_acum, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
+        iluminacion_indirecta(interseccion,normal, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
         intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
         intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
         intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
@@ -265,7 +266,7 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_secundarios(interseccion, sig_origen, /*desplazamiento.modulo() +*/ dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_rayos(interseccion, sig_origen, /*desplazamiento.modulo() +*/ dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
 void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
@@ -297,11 +298,11 @@ void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, 
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_secundarios(interseccion, sig_origen, /*desplazamiento.modulo() + */dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_rayos(interseccion, sig_origen, /*desplazamiento.modulo() +*/ dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
-//Lanza los rayos secundarios(refractados, luz directa...) y guarda en luz los valores obtenidos
-void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
+//Lanza los rayos (refractados, luz directa...) y guarda en luz los valores obtenidos
+void lanzar_rayos(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
     if(rebotes != 0) {
         switch (lista_esferas[ultima]->getSuperficie()) {
             case Phong:
@@ -376,7 +377,7 @@ int main(int argc, char* argv[]) {
                 Vector desplazamiento = Vector::productoEscalar(&d, punto_mas_cercano);
                 Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
                 float intensidad[3] = {0.0,0.0,0.0};
-                lanzar_secundarios(camara.getP(), sig_origen, 0, mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
+                lanzar_rayos(camara.getP(), sig_origen, 0, mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
 
                 if(intensidad[0]>max_color){
                     max_color = intensidad[0];

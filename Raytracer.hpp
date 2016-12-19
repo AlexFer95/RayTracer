@@ -15,14 +15,14 @@
 #define MAX_REBOTES 4
 #define MAX_RAYOS 16
 #define MAX_REBOTES_IND 1
-#define EPSILON 0.0001
+#define EPSILON 0.001
 #define NUM_ESCENAS 1
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
 const int ANCHO_IMAGEN = 200;
 const int ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
-const float DISTANCIA_PANTALLA = 0.5;
+const float DISTANCIA_PANTALLA = 1;
 const float ANCHO_PANTALLA = 1;
 const float ALTO_PANTALLA = 1;
 const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
@@ -70,9 +70,9 @@ Esfera cv_right(Punto(camara.getPref()->getX() + 1000.5, camara.getPref()->getY(
 Esfera cv_floor(Punto(camara.getPref()->getX() , camara.getPref()->getY() - 1000.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_gris);
 Esfera cv_roof(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_gris);
 Esfera cv_back(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 1001), 1000, p_gris);
-Esfera cv_spe(Punto(camara.getPref()->getX() - 0.15, camara.getPref()->getY() - 0.25, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.7), 0.25, reflex);
-Esfera cv_ref(Punto(camara.getPref()->getX() + 0.3, camara.getPref()->getY() - 0.35, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 0.15, refrac);
-FuenteLuz f0(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.3), 400);
+Esfera cv_spe(Punto(camara.getPref()->getX() - 0.1, camara.getPref()->getY() - 0.25, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.7), 0.25, reflex);
+Esfera cv_ref(Punto(camara.getPref()->getX() + 0.2, camara.getPref()->getY() - 0.35, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 0.15, refrac);
+FuenteLuz f0(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.3), 255);
 
 //PROTOTIPOS DE LAS FUNCIONES
 void cargar_escena(int escena);
@@ -86,7 +86,7 @@ void colisionRayoObjetos(Rayo* r, int* i, float* j);
 void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
-void lanzar_secundarios(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
+void lanzar_rayos(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 
 
 #endif //RAYTRACER_RAYTRACER_H
