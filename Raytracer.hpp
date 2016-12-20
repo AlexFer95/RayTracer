@@ -13,20 +13,22 @@
 #define PI 3.14159
 #define ALPHA 70
 #define MAX_REBOTES 4
-#define MAX_RAYOS 16
+#define MAX_RAYOS 32
 #define MAX_REBOTES_IND 1
 #define EPSILON 0.001
 #define NUM_ESCENAS 1
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
-const int ANCHO_IMAGEN = 200;
-const int ALTO_IMAGEN = ANCHO_IMAGEN;
 const float COLOR_IMAGEN = 255;
 const float DISTANCIA_PANTALLA = 1;
 const float ANCHO_PANTALLA = 1;
 const float ALTO_PANTALLA = 1;
-const float TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
 
+
+//VARIABLES DE LA IMAGEN Y LA PANTALLA
+int ANCHO_IMAGEN;
+int ALTO_IMAGEN;
+float TAM_PIXEL;
 
 //COLORES
 const float amarillo[3] = { 0.4 , 0.4 , 0.2 };
@@ -36,7 +38,7 @@ const float morado[3] = { 0.4 , 0.2 , 0.4 };
 const float negro[3] = { 0.0 , 0.0 , 0.0 };
 const float rojo[3] = { 0.8 , 0.1 , 0.1 };
 const float verde[3] = { 0.1 , 0.8 , 0.1 };
-const float gris[3] = { 0.3 , 0.3 , 0.3};
+const float gris[3] = { 0.3333 , 0.3333 , 0.3333};
 const float blanco[3] = {1.0 , 1.0 , 1.0};
 
 //VARIABLES DEL TRAZADOR
@@ -62,7 +64,7 @@ Material p_azul2 = { azul2 , 0.0 , 0.0 , Phong};
 Material p_verde = { verde , 0.0 , 0.0 , Phong};
 Material p_gris = { gris , 0.0 , 0.0 , Phong};
 Material reflex = { blanco , 0.0 , 0.0 , Reflexion};
-Material refrac = { blanco , 0.0 , 1.4 , Refraccion};
+Material refrac = { blanco , 0.0 , 1.7 , Refraccion};
 
 //ESCENA 1: CORNELL BOX (1x1)
 Esfera cv_left(Punto(camara.getPref()->getX() - 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_rojo);
@@ -70,18 +72,18 @@ Esfera cv_right(Punto(camara.getPref()->getX() + 1000.5, camara.getPref()->getY(
 Esfera cv_floor(Punto(camara.getPref()->getX() , camara.getPref()->getY() - 1000.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_gris);
 Esfera cv_roof(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_gris);
 Esfera cv_back(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 1001), 1000, p_gris);
-Esfera cv_spe(Punto(camara.getPref()->getX() - 0.1, camara.getPref()->getY() - 0.25, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.7), 0.25, reflex);
-Esfera cv_ref(Punto(camara.getPref()->getX() + 0.2, camara.getPref()->getY() - 0.35, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 0.15, refrac);
-FuenteLuz f0(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.3), 255);
+Esfera cv_spe(Punto(camara.getPref()->getX() - 0.15, camara.getPref()->getY() - 0.25, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.7), 0.25, reflex);
+Esfera cv_ref(Punto(camara.getPref()->getX() + 0.25, camara.getPref()->getY() - 0.35, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 0.15, refrac);
+FuenteLuz f0(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.2 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.3), 1);
 
 //PROTOTIPOS DE LAS FUNCIONES
 void cargar_escena(int escena);
 Matriz calcular_locales(Vector normal, Punto posicion);
 void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr);
-void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr, Vector omega_o, int esfera, int rebotes);
+void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr, Vector omega_o, int esfera, int rebotes, int rebotesInd);
 Vector calcular_reflejado(Vector* rayo, Vector* normal);
 Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2);
-float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia);
+float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia, bool indirecta);
 void colisionRayoObjetos(Rayo* r, int* i, float* j);
 void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);

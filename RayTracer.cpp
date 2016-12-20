@@ -145,7 +145,7 @@ Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2){
 }
 
 //Calcula la iluminacion directa que llega a un punto(rayos de luz/sombra)
-float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia){
+float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia, bool indirecta){
     bool directa = true;
 
     //Se calculan las intersecciones con las esferas
@@ -161,7 +161,10 @@ float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia){
         }
     }
 
-    if(directa) {
+    if(directa && indirecta) {
+        return lista_luces[num_luz]->getEnergia();
+    }
+    if(directa){
         return  lista_luces[num_luz]->getEnergia() / ((dist_acum+distancia)*(dist_acum+distancia));
     }
 
@@ -217,7 +220,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
         Rayo rayo_luz(interseccion, omega_i);
 
         //Se lanza el rayo a la luz
-        float li = lanzar_rayo_luz(&rayo_luz, i, dist_acum, distancia);
+        float li = lanzar_rayo_luz(&rayo_luz, i, dist_acum, distancia, rebotesIndirectos>0);
 
         //Calculamos el valor de la brdf
         float fr[3] = { 0.0, 0.0, 0.0 };
@@ -237,7 +240,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
 
     if(rebotesIndirectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-        iluminacion_indirecta(interseccion,normal, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
+        iluminacion_indirecta(interseccion, normal, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
         intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
         intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
         intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
@@ -266,7 +269,7 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_rayos(interseccion, sig_origen, /*desplazamiento.modulo() +*/ dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_rayos(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
 void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
@@ -321,14 +324,22 @@ void lanzar_rayos(Punto previo, Punto interseccion, float dist_acum, int ultima,
 
 int main(int argc, char* argv[]) {
 
-    if(argc != 2){
-        cout << "Uso: ./RayTracer [num_escena]" << endl;
+    if(argc != 3){
+        cout << "Uso: ./RayTracer [num_escena] [tam_imagen]" << endl;
         return -1;
     }
 
     int escena = atoi(argv[1]);
     if(escena<1 || escena>NUM_ESCENAS){
         cout << "[num_escena] debe estar comprendido entre 1 y " << NUM_ESCENAS << endl;
+        return -1;
+    }
+
+    ANCHO_IMAGEN = atoi(argv[2]);
+    ALTO_IMAGEN = ANCHO_IMAGEN;
+    TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
+    if(ANCHO_IMAGEN<100){
+        cout << "[tam_imagen] debe ser mayor que 100" << endl;
         return -1;
     }
 
@@ -406,13 +417,7 @@ int main(int argc, char* argv[]) {
     for(int i=0 ; i<ALTO_IMAGEN ; i++){
         for(int j=0 ; j<ANCHO_IMAGEN ; j++){
             for(int k=0 ; k<3 ; k++){
-
-                if(max_color > 255) {
-                    fs << (int) (255 * buffer[j][i][k] / max_color) << " ";
-                }
-                else{
-                    fs << (int) buffer[j][i][k] << " ";
-                }
+                fs << (int) (255 * buffer[j][i][k] / max_color) << " ";
             }
             fs << " ";
         }
