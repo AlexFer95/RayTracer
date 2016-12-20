@@ -269,7 +269,7 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_rayos(interseccion, sig_origen, desplazamiento.modulo() + dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_rayos(interseccion, sig_origen, /*desplazamiento.modulo() +*/ dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
 void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
