@@ -27,6 +27,87 @@ void cargar_escena(int escena){
             lista_esferas[6] = &cv_ref;
             lista_luces[0] = &f0;
             break;
+        case 2:
+            num_luces = 2;
+            num_esferas = 12;
+            lista_esferas[0] = &cv_left2;
+
+            lista_esferas[1] = &tronco1;
+            lista_esferas[2] = &tronco2;
+            lista_esferas[3] = &hojas1;
+            lista_esferas[4] = &hojas2;
+            lista_esferas[5] = &hojas3;
+            lista_esferas[6] = &bola1;
+            lista_esferas[7] = &bola2;
+            lista_esferas[8] = &bola3;
+            lista_esferas[9] = &bola4;
+            lista_esferas[10] = &bola5;
+
+            lista_esferas[11] = &cv_floor2;
+           /* lista_esferas[1] = &cv_right2;
+            lista_esferas[2] = &cv_floor2;
+            lista_esferas[3] = &cv_roof2;
+            lista_esferas[4] = &cv_back2;
+            lista_esferas[5] = &tronco1;
+            lista_esferas[6] = &tronco2;
+            lista_esferas[7] = &hojas1;
+            lista_esferas[8] = &hojas2;
+            lista_esferas[9] = &hojas3;
+            lista_esferas[10] = &bola1;
+            lista_esferas[11] = &bola2;
+            lista_esferas[12] = &bola3;
+            lista_esferas[13] = &bola4;
+            lista_esferas[14] = &bola5;*/
+            lista_luces[0] = &f0_2;
+            lista_luces[1] = &f1_2;
+            break;
+        case 3:
+            num_luces = 2;
+            num_esferas = 5;
+
+            lista_esferas[0] = &suelo1;
+            lista_esferas[1] = &suelo2;
+            lista_esferas[2] = &suelo3;
+            lista_esferas[3] = &suelo4;
+            lista_esferas[4] = &e0_3;
+            //lista_esferas[5] = &e2;
+
+            lista_luces[0] = &f0_3;
+            lista_luces[1] = &f1_3;
+            break;
+        case 4:
+
+            num_luces = 2;
+            num_esferas = 20;
+
+            lista_esferas[0] = &e0_4;
+            lista_esferas[1] = &e1_4;
+            lista_esferas[2] = &e2_4;
+            lista_esferas[3] = &e3_4;
+            lista_esferas[4] = &e4_4;
+
+            lista_esferas[5] = &e5_4;
+            lista_esferas[6] = &e6_4;
+            lista_esferas[7] = &e7_4;
+            lista_esferas[8] = &e8_4;
+            lista_esferas[9] = &e9_4;
+
+            lista_esferas[10] = &e10_4;
+            lista_esferas[11] = &e11_4;
+            lista_esferas[12] = &e12_4;
+            lista_esferas[13] = &e13_4;
+            lista_esferas[14] = &e14_4;
+
+            lista_esferas[15] = &e15_4;
+            lista_esferas[16] = &e16_4;
+            lista_esferas[17] = &e17_4;
+            lista_esferas[18] = &e18_4;
+            lista_esferas[19] = &e19_4;
+
+
+            lista_luces[0] = &f0_4;
+            lista_luces[1] = &f1_4;
+            break;
     }
 }
 
@@ -240,7 +321,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
 
     if(rebotesIndirectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-        iluminacion_indirecta(interseccion, normal, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
+       // iluminacion_indirecta(interseccion, normal, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
         intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
         intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
         intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
@@ -323,7 +404,7 @@ void lanzar_rayos(Punto previo, Punto interseccion, float dist_acum, int ultima,
 
 
 int main(int argc, char* argv[]) {
-
+    /*
     if(argc != 3){
         cout << "Uso: ./RayTracer [num_escena] [tam_imagen]" << endl;
         return -1;
@@ -335,7 +416,13 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    ANCHO_IMAGEN = atoi(argv[2]);
+     */
+    int escena = 4;
+    ANCHO_IMAGEN = 200;
+    //si postRenderizado == 0 los colores que superen 255 seran reducidos a 255
+    //si postRenderizado == 1 los colores seran promediados por el color de mayor intensidad
+    int postRenderizado = 0;
+    //ANCHO_IMAGEN = atoi(argv[2]);
     ALTO_IMAGEN = ANCHO_IMAGEN;
     TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
     if(ANCHO_IMAGEN<100){
@@ -417,7 +504,21 @@ int main(int argc, char* argv[]) {
     for(int i=0 ; i<ALTO_IMAGEN ; i++){
         for(int j=0 ; j<ANCHO_IMAGEN ; j++){
             for(int k=0 ; k<3 ; k++){
-                fs << (int) (255 * buffer[j][i][k] / max_color) << " ";
+                switch(postRenderizado){
+                    case 0:
+                        if(255*buffer[j][i][k]>255){
+                            fs << 255 << " ";
+                        }
+                        else{
+                            fs << (int) (255*buffer[j][i][k]) << " ";
+                        }
+                        break;
+                    case 1:
+                        fs << (int) (255 * buffer[j][i][k] / max_color) << " ";
+                        break;
+
+                }
+
             }
             fs << " ";
         }
