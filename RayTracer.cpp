@@ -58,7 +58,6 @@ void cargar_escena(int escena){
             lista_esferas[2] = &suelo3;
             lista_esferas[3] = &suelo4;
             lista_esferas[4] = &e0_3;
-            //lista_esferas[5] = &e2;
 
             lista_luces[0] = &f0_3;
             lista_luces[1] = &f1_3;
@@ -133,7 +132,7 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr){
         cos_theta_r = 0;
     }
     //Calculo de la componente especular de la brdf
-    float ks = lista_esferas[ultima_esfera]->getKs()*((2+ALPHA)/(2*PI))*pow(cos_theta_r,ALPHA); // Alpha = 5 constante
+    float ks = lista_esferas[ultima_esfera]->getKs()*((2+lista_esferas[ultima_esfera]->getAlpha())/(2*PI))*pow(cos_theta_r,lista_esferas[ultima_esfera]->getAlpha());
     //Se suman la componente difusa y la especular.
     fr[0] = lista_esferas[ultima_esfera]->getKd()[0]/PI + ks;
     fr[1] = lista_esferas[ultima_esfera]->getKd()[1]/PI + ks;
@@ -436,47 +435,57 @@ int main(int argc, char* argv[]) {
 
     char uso[] = "Uso: ./RayTracer [num_escena] [tam_imagen] [num_rayos_indirectos] [post_procesado]";
 
-    if(argc != 5){
-        cout << uso << endl;
-        return -1;
-    }
+    int escena;
 
-    int escena = atoi(argv[1]);
-    if(escena<1 || escena>NUM_ESCENAS){
-        cout << uso << endl;
-        cout << "[num_escena] debe estar comprendido entre 1 y " << NUM_ESCENAS << endl;
-        return -1;
-    }
-
-    ANCHO_IMAGEN = atoi(argv[2]);
-    ALTO_IMAGEN = ANCHO_IMAGEN;
-    TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
-    if(ANCHO_IMAGEN<100){
-        cout << "Uso: ./RayTracer [num_escena] [tam_imagen] [num_rayos_indirectos]" << endl;
-        cout << "[tam_imagen] debe ser mayor que 100" << endl;
-        return -1;
-    }
-
-    MAX_RAYOS = atoi(argv[3]);
-    if(MAX_RAYOS<1){
-        cout << uso << endl;
-        cout << "[num_rayos_indirectos] debe ser mayor que 1" << endl;
-        return -1;
-    }
-
-    int post_procesado = atoi(argv[4]);
-    if(post_procesado==0){
-        POST_PROCESADO = false;
-    }
-    else if(post_procesado==1){
+    if(argc == 1){
+        escena = 1;
+        ANCHO_IMAGEN = 500;
+        MAX_RAYOS = 32;
         POST_PROCESADO = true;
+    }
+    else if(argc == 5){
+        escena = atoi(argv[1]);
+        if(escena<1 || escena>NUM_ESCENAS){
+            cout << uso << endl;
+            cout << "[num_escena] debe estar comprendido entre 1 y " << NUM_ESCENAS << endl;
+            return -1;
+        }
+
+        ANCHO_IMAGEN = atoi(argv[2]);
+        if(ANCHO_IMAGEN<100){
+            cout << uso << endl;
+            cout << "[tam_imagen] debe ser mayor que 100" << endl;
+            return -1;
+        }
+
+        MAX_RAYOS = atoi(argv[3]);
+        if(MAX_RAYOS<1){
+            cout << uso << endl;
+            cout << "[num_rayos_indirectos] debe ser mayor que 1" << endl;
+            return -1;
+        }
+
+        int post_procesado = atoi(argv[4]);
+        if(post_procesado==0){
+            POST_PROCESADO = false;
+        }
+        else if(post_procesado==1){
+            POST_PROCESADO = true;
+        }
+        else{
+            cout << uso << endl;
+            cout << "[post_procesado] debe ser 0 para limitar a 255 el exceso de luz" << endl;
+            cout << "[post_procesado] debe ser 1 para adecuar la imagen a la maxima energia" << endl;
+            return -1;
+        }
     }
     else{
         cout << uso << endl;
-        cout << "[post_procesado] debe ser 0 para limitar a 255 el exceso de luz" << endl;
-        cout << "[post_procesado] debe ser 1 para adecuar la imagen a la maxima energia" << endl;
         return -1;
     }
+
+    ALTO_IMAGEN = ANCHO_IMAGEN;
+    TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
 
     cargar_escena(escena);
 
@@ -552,7 +561,7 @@ int main(int argc, char* argv[]) {
     for(int i=0 ; i<ALTO_IMAGEN ; i++){
         for(int j=0 ; j<ANCHO_IMAGEN ; j++){
             for(int k=0 ; k<3 ; k++){
-                if(POST_PROCESADO) {
+                if(!POST_PROCESADO) {
                     if (255 * buffer[j][i][k] > 255) {
                         fs << 255 << " ";
                     }

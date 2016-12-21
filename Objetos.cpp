@@ -128,8 +128,13 @@ const float* Esfera::getKd(){
 float Esfera::getKs(){
 	return m.ks;
 }
+
 float Esfera::getKr(){
     return m.kr;
+}
+
+float Esfera::getAlpha() {
+    return m.alpha;
 }
 
 int Esfera::getSuperficie(){

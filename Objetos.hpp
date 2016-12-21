@@ -19,6 +19,7 @@ struct Material{
 	float ks;
     //indice de refracción
 	float kr;
+    float alpha;
 	Superficie s;
 };
 
@@ -102,6 +103,7 @@ class Esfera : public Objeto{
 		const float* getKd();
         float getKs();
         float getKr();
+        float getAlpha();
 		int getSuperficie();
 
         Esfera transformar(Matriz coorLocales);
