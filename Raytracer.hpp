@@ -1,6 +1,3 @@
-//
-// Created by adrian on 11/11/2016.
-//
 
 #ifndef RAYTRACER_RAYTRACER_H
 #define RAYTRACER_RAYTRACER_H

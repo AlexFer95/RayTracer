@@ -15,7 +15,9 @@ enum Superficie{
 
 struct Material{
 	const float* kd;
+    //componente especular
 	float ks;
+    //indice de refracción
 	float kr;
 	Superficie s;
 };
