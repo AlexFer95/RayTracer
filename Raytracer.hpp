@@ -15,7 +15,7 @@
 #define MAX_REBOTES 4
 #define MAX_REBOTES_IND 1
 #define EPSILON 0.001
-#define NUM_ESCENAS 1
+#define NUM_ESCENAS 4
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
 const float COLOR_IMAGEN = 255;
@@ -152,7 +152,6 @@ Esfera e17_4(Punto(camara.getPref()->getX(), camara.getPref()->getY()+0.45, cama
 Esfera e18_4(Punto(camara.getPref()->getX()+0.25, camara.getPref()->getY()+0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_verde4);
 Esfera e19_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY()+0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_verde5);
 
-Esfera e20(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+1001), 1000, p_blanco);
 
 FuenteLuz f0_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY() +2, camara.getPref()->getZ() -  5), 4);
 FuenteLuz f1_4(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.5 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 5);

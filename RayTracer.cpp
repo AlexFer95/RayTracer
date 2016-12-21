@@ -104,7 +104,6 @@ void cargar_escena(int escena){
             lista_esferas[18] = &e18_4;
             lista_esferas[19] = &e19_4;
 
-            lista_esferas[20] = &e20;
 
 
             lista_luces[0] = &f0_4;
@@ -117,9 +116,12 @@ void cargar_escena(int escena){
 Matriz calcular_locales(Vector normal, Punto posicion){
     Vector cualquiera = Vector(1,0,0);
     Vector u = Vector::pVectorial(&normal,&cualquiera);
+    //Si el vector resultante no es perpendicular a la normal se prueba con otro
     if(u.modulo()==0){
         cualquiera = Vector(0,1,0);
         u = Vector::pVectorial(&normal,&cualquiera);
+
+        //Si el vector resultante no es perpendicular a la normal se prueba con otro que por descarte lo sera
         if(u.modulo()==0){
             cualquiera = Vector(0,0,1);
             u = Vector::pVectorial(&normal,&cualquiera);
