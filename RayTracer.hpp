@@ -11,7 +11,7 @@
 #define MAX_REBOTES 4
 #define MAX_REBOTES_IND 1
 #define EPSILON 0.001
-#define NUM_ESCENAS 4
+#define NUM_ESCENAS 5
 
 //CONSTANTES DE LA IMAGEN Y LA PANTALLA
 const float COLOR_IMAGEN = 255;
@@ -80,6 +80,12 @@ Material p_marron = { marron , 0.0 , 0.0 , 70.0, Phong};
 Material p_gris = { gris , 0.0 , 0.0 , 70.0, Phong};
 Material p_blanco = { blanco , 0.0 , 0.0 , 70.0, Phong};
 Material p_blanco2 = { blanco , 0.1 , 0.0 , 70.0, Phong};
+
+
+Material p_rojoA1 = { rojo , 0.1 , 0.0 , 20.0, Phong};
+Material p_rojoA2 = { rojo , 0.1 , 0.0 , 10.0, Phong};
+Material p_rojoA3 = { rojo , 0.1 , 0.0 , 1.0, Phong};
+
 Material reflex = { blanco , 0.0 , 0.0 , 70.0, Reflexion};
 Material refrac = { blanco , 0.0 , 1.7 , 70.0, Refraccion};
 
@@ -111,8 +117,8 @@ Esfera bola4(Punto(camara.getPref()->getX()-0.05, camara.getPref()->getY()+0.1, 
 Esfera bola5(Punto(camara.getPref()->getX()-0.075, camara.getPref()->getY()-0.05, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.38), 0.02, p_azul3);
 Esfera bola6(Punto(camara.getPref()->getX(), camara.getPref()->getY()+0.2, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.07, p_amar4);
 
-FuenteLuz f0_2(Punto(camara.getPref()->getX()-0.2, camara.getPref()->getY() - 0.1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 1.2);
-FuenteLuz f1_2(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.2 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.2), 2);
+FuenteLuz f0_2(Punto(camara.getPref()->getX()-0.2, camara.getPref()->getY() - 0.1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 1.3);
+FuenteLuz f1_2(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.2 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.2), 2.1);
 
 //ESCENA 3
 Esfera suelo1(Punto(camara.getPref()->getX(), camara.getPref()->getY()-0.7, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.6), 0.5, p_verde);
@@ -152,6 +158,14 @@ Esfera e19_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY()+0.45, 
 
 FuenteLuz f0_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY() +2, camara.getPref()->getZ() -  5), 4);
 FuenteLuz f1_4(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.5 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 5);
+
+//ESCENA 5
+Esfera e0_5(Punto(camara.getPref()->getX()-0.40, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.13, p_rojoA3);
+Esfera e1_5(Punto(camara.getPref()->getX()-0.13, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.13, p_rojoA2);
+Esfera e2_5(Punto(camara.getPref()->getX()+0.13, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.13, p_rojoA1);
+Esfera e3_5(Punto(camara.getPref()->getX()+0.40, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.13, p_rojo4);
+
+FuenteLuz f0_5(Punto(camara.getPref()->getX()-1, camara.getPref()->getY() +2, camara.getPref()->getZ() -  4), 3);
 
 //PROTOTIPOS DE LAS FUNCIONES
 void cargar_escena(int escena);

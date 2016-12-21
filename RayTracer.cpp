@@ -96,6 +96,18 @@ void cargar_escena(int escena){
             lista_luces[0] = &f0_4;
             lista_luces[1] = &f1_4;
             break;
+        case 5:
+            num_luces = 1;
+            num_esferas = 4;
+
+            lista_esferas[0] = &e0_5;
+            lista_esferas[1] = &e1_5;
+            lista_esferas[2] = &e2_5;
+            lista_esferas[3] = &e3_5;
+
+            lista_luces[0] = &f0_5;
+
+            break;
     }
 }
 
@@ -338,7 +350,7 @@ void fPhong(Punto previo, Punto interseccion, int ultima, int rebotes, int rebot
     //Si se permite se calcula iluminación indirecta y se añade a la solucion
     if(rebotesIndirectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-        iluminacion_indirecta(interseccion, normal, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
+        //iluminacion_indirecta(interseccion, normal, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
         intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
         intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
         intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
