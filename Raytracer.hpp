@@ -13,7 +13,6 @@
 #define PI 3.14159
 #define ALPHA 70
 #define MAX_REBOTES 4
-#define MAX_RAYOS 16
 #define MAX_REBOTES_IND 1
 #define EPSILON 0.001
 #define NUM_ESCENAS 1
@@ -43,6 +42,8 @@ const float gris[3] = { 0.3333 , 0.3333 , 0.3333};
 const float blanco[3] = {1.0 , 1.0 , 1.0};
 
 //VARIABLES DEL TRAZADOR
+int MAX_RAYOS;
+bool POST_PROCESADO;
 float*** buffer;
 
 std::default_random_engine generator;
@@ -163,12 +164,12 @@ void brdf(Vector* omega_i, Vector* omega_r, int ultima_esfera, float* fr);
 void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr, Vector omega_o, int esfera, int rebotes, int rebotesInd);
 Vector calcular_reflejado(Vector* rayo, Vector* normal);
 Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2);
-float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia, bool indirecta);
+float lanzar_rayo_luz(Rayo* r, int num_luz, float distancia, bool indirecta);
 void colisionRayoObjetos(Rayo* r, int* i, float* j);
-void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
-void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
-void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
-void lanzar_rayos(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
+void fPhong(Punto previo, Punto interseccion, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
+void fReflexion(Punto previo, Punto interseccion, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
+void fRefraccion(Punto previo, Punto interseccion, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
+void lanzar_rayos(Punto previo, Punto interseccion, int ultima, int rebotes, int rebotesIndirectos, float* intensidad);
 
 
 #endif //RAYTRACER_RAYTRACER_H

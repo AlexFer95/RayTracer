@@ -173,7 +173,7 @@ void iluminacion_indirecta(Punto interseccion, Vector normal, float* fr, Vector 
             //Se lanzan rayos secundarios
             Vector desplazamiento = Vector::productoEscalar(&omega_i, punto_mas_cercano);
             Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-            lanzar_rayos(interseccion, sig_origen, desplazamiento.modulo(), mas_cercana, rebotes, --rebotesInd, intensidad);
+            lanzar_rayos(interseccion, sig_origen, mas_cercana, rebotes, --rebotesInd, intensidad);
         }
         float intensidad_brdf[3] = {0.0, 0.0, 0.0};
         brdf(&omega_i, &omega_o, esfera, intensidad_brdf);
@@ -228,7 +228,7 @@ Vector calcular_refractado(Vector* rayo, Vector* normal, double n1, double n2){
 }
 
 //Calcula la iluminacion directa que llega a un punto(rayos de luz/sombra)
-float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia, bool indirecta){
+float lanzar_rayo_luz(Rayo* r, int num_luz, float distancia, bool indirecta){
     bool directa = true;
 
     //Se calculan las intersecciones con las esferas
@@ -248,7 +248,7 @@ float lanzar_rayo_luz(Rayo* r, int num_luz, float dist_acum, float distancia, bo
         return lista_luces[num_luz]->getEnergia();
     }
     if(directa){
-        return  lista_luces[num_luz]->getEnergia() / ((dist_acum+distancia)*(dist_acum+distancia));
+        return  lista_luces[num_luz]->getEnergia() / distancia*distancia;
     }
 
     return 0.0;
@@ -280,7 +280,7 @@ void colisionRayoObjetos(Rayo* r, int* i, float* j){
     *j = punto_mas_cercano;
 }
 
-void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
+void fPhong(Punto previo, Punto interseccion, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
     rayo_previo.normalizar();
 
@@ -303,7 +303,7 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
         Rayo rayo_luz(interseccion, omega_i);
 
         //Se lanza el rayo a la luz
-        float li = lanzar_rayo_luz(&rayo_luz, i, dist_acum, distancia, rebotesIndirectos>0);
+        float li = lanzar_rayo_luz(&rayo_luz, i, distancia, rebotesIndirectos>0);
 
         //Calculamos el valor de la brdf
         float fr[3] = { 0.0, 0.0, 0.0 };
@@ -323,14 +323,14 @@ void fPhong(Punto previo, Punto interseccion, float dist_acum, int ultima, int r
 
     if(rebotesIndirectos>0){
         float luzIndirecta[3] = { 0.0, 0.0, 0.0 };
-       // iluminacion_indirecta(interseccion, normal, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
+        iluminacion_indirecta(interseccion, normal, luzIndirecta, omega_r, ultima, rebotes, rebotesIndirectos);
         intensidad[0] = intensidad[0] + luzIndirecta[0];//*0.1;
         intensidad[1] = intensidad[1] + luzIndirecta[1];//*0.1;
         intensidad[2] = intensidad[2] + luzIndirecta[2];//*0.1;
     }
 
 }
-void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
+void fReflexion(Punto previo, Punto interseccion, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
     rayo_previo.normalizar();
 
@@ -352,10 +352,10 @@ void fReflexion(Punto previo, Punto interseccion, float dist_acum, int ultima, i
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_rayos(interseccion, sig_origen, /*desplazamiento.modulo() +*/ dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_rayos(interseccion, sig_origen, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
-void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
+void fRefraccion(Punto previo, Punto interseccion, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
     Vector rayo_previo = Vector::getDireccion(&interseccion, &previo);
     rayo_previo.normalizar();
 
@@ -384,21 +384,21 @@ void fRefraccion(Punto previo, Punto interseccion, float dist_acum, int ultima, 
         //Se lanzan rayos secundarios
         Vector desplazamiento = Vector::productoEscalar(&omega_r, punto_mas_cercano);
         Punto sig_origen = Punto::desplazar(&interseccion, &desplazamiento);
-        lanzar_rayos(interseccion, sig_origen, /*desplazamiento.modulo() +*/ dist_acum, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
+        lanzar_rayos(interseccion, sig_origen, mas_cercana, rebotes-1, rebotesIndirectos, intensidad);
     }
 }
 //Lanza los rayos (refractados, luz directa...) y guarda en luz los valores obtenidos
-void lanzar_rayos(Punto previo, Punto interseccion, float dist_acum, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
+void lanzar_rayos(Punto previo, Punto interseccion, int ultima, int rebotes, int rebotesIndirectos, float* intensidad){
     if(rebotes != 0) {
         switch (lista_esferas[ultima]->getSuperficie()) {
             case Phong:
-                fPhong(previo, interseccion, dist_acum, ultima, rebotes, rebotesIndirectos, intensidad);
+                fPhong(previo, interseccion, ultima, rebotes, rebotesIndirectos, intensidad);
                 break;
             case Reflexion:
-                fReflexion(previo, interseccion, dist_acum, ultima, rebotes, rebotesIndirectos, intensidad);
+                fReflexion(previo, interseccion, ultima, rebotes, rebotesIndirectos, intensidad);
                 break;
             case Refraccion:
-                fRefraccion(previo, interseccion, dist_acum, ultima, rebotes, rebotesIndirectos, intensidad);
+                fRefraccion(previo, interseccion, ultima, rebotes, rebotesIndirectos, intensidad);
                 break;
         }
     }
@@ -406,29 +406,48 @@ void lanzar_rayos(Punto previo, Punto interseccion, float dist_acum, int ultima,
 
 
 int main(int argc, char* argv[]) {
-    /*
-    if(argc != 3){
-        cout << "Uso: ./RayTracer [num_escena] [tam_imagen]" << endl;
+
+    char uso[] = "Uso: ./RayTracer [num_escena] [tam_imagen] [num_rayos_indirectos] [post_procesado]";
+
+    if(argc != 5){
+        cout << uso << endl;
         return -1;
     }
 
     int escena = atoi(argv[1]);
     if(escena<1 || escena>NUM_ESCENAS){
+        cout << uso << endl;
         cout << "[num_escena] debe estar comprendido entre 1 y " << NUM_ESCENAS << endl;
         return -1;
     }
 
-     */
-    int escena = 4;
-    ANCHO_IMAGEN = 400;
-    //si postRenderizado == 0 los colores que superen 255 seran reducidos a 255
-    //si postRenderizado == 1 los colores seran promediados por el color de mayor intensidad
-    int postRenderizado = 0;
-    //ANCHO_IMAGEN = atoi(argv[2]);
+    ANCHO_IMAGEN = atoi(argv[2]);
     ALTO_IMAGEN = ANCHO_IMAGEN;
     TAM_PIXEL = ANCHO_PANTALLA / ANCHO_IMAGEN;
     if(ANCHO_IMAGEN<100){
+        cout << "Uso: ./RayTracer [num_escena] [tam_imagen] [num_rayos_indirectos]" << endl;
         cout << "[tam_imagen] debe ser mayor que 100" << endl;
+        return -1;
+    }
+
+    MAX_RAYOS = atoi(argv[3]);
+    if(MAX_RAYOS<1){
+        cout << uso << endl;
+        cout << "[num_rayos_indirectos] debe ser mayor que 1" << endl;
+        return -1;
+    }
+
+    int post_procesado = atoi(argv[4]);
+    if(post_procesado==0){
+        POST_PROCESADO = false;
+    }
+    else if(post_procesado==1){
+        POST_PROCESADO = true;
+    }
+    else{
+        cout << uso << endl;
+        cout << "[post_procesado] debe ser 0 para limitar a 255 el exceso de luz" << endl;
+        cout << "[post_procesado] debe ser 1 para adecuar la imagen a la maxima energia" << endl;
         return -1;
     }
 
@@ -477,7 +496,7 @@ int main(int argc, char* argv[]) {
                 Vector desplazamiento = Vector::productoEscalar(&d, punto_mas_cercano);
                 Punto sig_origen = Punto::desplazar(camara.getPref(), &desplazamiento);
                 float intensidad[3] = {0.0,0.0,0.0};
-                lanzar_rayos(camara.getP(), sig_origen, 0, mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
+                lanzar_rayos(camara.getP(), sig_origen, mas_cercana, MAX_REBOTES, MAX_REBOTES_IND, intensidad);
 
                 if(intensidad[0]>max_color){
                     max_color = intensidad[0];
@@ -506,19 +525,16 @@ int main(int argc, char* argv[]) {
     for(int i=0 ; i<ALTO_IMAGEN ; i++){
         for(int j=0 ; j<ANCHO_IMAGEN ; j++){
             for(int k=0 ; k<3 ; k++){
-                switch(postRenderizado){
-                    case 0:
-                        if(255*buffer[j][i][k]>255){
-                            fs << 255 << " ";
-                        }
-                        else{
-                            fs << (int) (255*buffer[j][i][k]) << " ";
-                        }
-                        break;
-                    case 1:
+                if(POST_PROCESADO) {
+                    if (255 * buffer[j][i][k] > 255) {
+                        fs << 255 << " ";
+                    }
+                    else {
+                        fs << (int) (255 * buffer[j][i][k]) << " ";
+                    }
+                }
+                else{
                         fs << (int) (255 * buffer[j][i][k] / max_color) << " ";
-                        break;
-
                 }
 
             }
