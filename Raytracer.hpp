@@ -49,7 +49,7 @@ std::default_random_engine generator;
 std::uniform_real_distribution<float> distribution(0.0,1.0);
 
 FuenteLuz *lista_luces[20];
-Esfera *lista_esferas[20];
+Esfera *lista_esferas[25];
 int num_luces;
 int num_esferas;
 
@@ -57,15 +57,28 @@ Punto origen(0, 0, 0); //Origen del sistema
 Matriz camara(Vector(1, 0, 0), Vector(0, 1, 0), Vector(0, 0, 1), Punto(ANCHO_PANTALLA / 2, ALTO_PANTALLA / 2, 0));
 
 //Definir materiales para las escenas
-Material p_azul = { azul , 0.0 , 0.0 , Phong};
+Material p_azul = { azul, 0.0 , 0.0 , Phong};
+Material p_azul2 = { azul, 0.001 , 0.0 , Phong};
+Material p_azul3 = { azul, 0.01 , 0.0 , Phong};
+Material p_azul4 = { azul, 0.1 , 0.0 , Phong};
+Material p_azul5 = { azul, 0.3 , 0.0 , Phong};
 Material p_amar = { amarillo , 0.0 , 0.0 , Phong};
-Material p_amar2 = { amarillo , 0.1 , 0.0 , Phong};
+Material p_amar2 = { amarillo , 0.001 , 0.0 , Phong};
+Material p_amar3 = { amarillo , 0.01 , 0.0 , Phong};
+Material p_amar4 = { amarillo , 0.1 , 0.0 , Phong};
+Material p_amar5 = { amarillo , 0.3 , 0.0 , Phong};
 Material p_mora = { morado , 0.0 , 0.0 , Phong};
 Material p_mora2 = { morado , 0.1 , 0.0 , Phong};
 Material p_rojo = { rojo , 0.0 , 0.0 , Phong};
-Material p_rojo2 = { rojo , 0.1 , 0.0 , Phong};
-Material p_azul2 = { azul2 , 0.1 , 0.0 , Phong};
+Material p_rojo2 = { rojo , 0.001 , 0.0 , Phong};
+Material p_rojo3 = { rojo , 0.01, 0.0 , Phong};
+Material p_rojo4 = { rojo , 0.1 , 0.0 , Phong};
+Material p_rojo5 = { rojo , 0.3 , 0.0 , Phong};
 Material p_verde = { verde , 0.0 , 0.0 , Phong};
+Material p_verde2 = { verde , 0.001 , 0.0 , Phong};
+Material p_verde3 = { verde , 0.01 , 0.0 , Phong};
+Material p_verde4 = { verde , 0.1 , 0.0 , Phong};
+Material p_verde5 = { verde , 0.3 , 0.0 , Phong};
 Material p_marron = { marron , 0.0 , 0.0 , Phong};
 Material p_gris = { gris , 0.0 , 0.0 , Phong};
 Material p_blanco = { blanco , 0.0 , 0.0 , Phong};
@@ -114,32 +127,34 @@ FuenteLuz f0_3(Punto(camara.getPref()->getX()-0.3, camara.getPref()->getY()+0.8 
 FuenteLuz f1_3(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 2);
 
 //ESCENA 4
-Esfera e0_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY()-0.25, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo);
-Esfera e1_4(Punto(camara.getPref()->getX()-0.25, camara.getPref()->getY()-0.25, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo);
-Esfera e2_4(Punto(camara.getPref()->getX(), camara.getPref()->getY()-0.25, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo);
-Esfera e3_4(Punto(camara.getPref()->getX()+0.25, camara.getPref()->getY()-0.25, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo);
-Esfera e4_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY()-0.25, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo);
+Esfera e0_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY()-0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo);
+Esfera e1_4(Punto(camara.getPref()->getX()-0.25, camara.getPref()->getY()-0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo2);
+Esfera e2_4(Punto(camara.getPref()->getX(), camara.getPref()->getY()-0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo3);
+Esfera e3_4(Punto(camara.getPref()->getX()+0.25, camara.getPref()->getY()-0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo4);
+Esfera e4_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY()-0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_rojo5);
 
-Esfera e5_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.1, p_amar);
-Esfera e6_4(Punto(camara.getPref()->getX()-0.25, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.1, p_amar);
-Esfera e7_4(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.1, p_amar);
-Esfera e8_4(Punto(camara.getPref()->getX()+0.25, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.1, p_amar);
-Esfera e9_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.1, p_amar);
+Esfera e5_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY()-0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_amar);
+Esfera e6_4(Punto(camara.getPref()->getX()-0.25, camara.getPref()->getY()-0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_amar2);
+Esfera e7_4(Punto(camara.getPref()->getX(), camara.getPref()->getY()-0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_amar3);
+Esfera e8_4(Punto(camara.getPref()->getX()+0.25, camara.getPref()->getY()-0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_amar4);
+Esfera e9_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY()-0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_amar5);
 
-Esfera e10_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY()+0.4, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.75), 0.1, p_azul2);
-Esfera e11_4(Punto(camara.getPref()->getX()-0.25, camara.getPref()->getY()+0.4, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.75), 0.1, p_azul2);
-Esfera e12_4(Punto(camara.getPref()->getX(), camara.getPref()->getY()+0.4, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.75), 0.1, p_azul2);
-Esfera e13_4(Punto(camara.getPref()->getX()+0.25, camara.getPref()->getY()+0.4, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.75), 0.1, p_azul2);
-Esfera e14_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY()+0.4, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.75), 0.1, p_azul2);
+Esfera e10_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY()+0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_azul);
+Esfera e11_4(Punto(camara.getPref()->getX()-0.25, camara.getPref()->getY()+0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_azul2);
+Esfera e12_4(Punto(camara.getPref()->getX(), camara.getPref()->getY()+0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_azul3);
+Esfera e13_4(Punto(camara.getPref()->getX()+0.25, camara.getPref()->getY()+0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_azul4);
+Esfera e14_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY()+0.15, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_azul5);
 
-Esfera e15_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY()+0.8, camara.getPref()->getZ()+DISTANCIA_PANTALLA+1), 0.1, p_verde);
-Esfera e16_4(Punto(camara.getPref()->getX()-0.25, camara.getPref()->getY()+0.8, camara.getPref()->getZ()+DISTANCIA_PANTALLA+1), 0.1, p_verde);
-Esfera e17_4(Punto(camara.getPref()->getX(), camara.getPref()->getY()+0.8, camara.getPref()->getZ()+DISTANCIA_PANTALLA+1), 0.1, p_verde);
-Esfera e18_4(Punto(camara.getPref()->getX()+0.25, camara.getPref()->getY()+0.8, camara.getPref()->getZ()+DISTANCIA_PANTALLA+1), 0.1, p_verde);
-Esfera e19_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY()+0.8, camara.getPref()->getZ()+DISTANCIA_PANTALLA+1), 0.1, p_verde);
+Esfera e15_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY()+0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_verde);
+Esfera e16_4(Punto(camara.getPref()->getX()-0.25, camara.getPref()->getY()+0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_verde2);
+Esfera e17_4(Punto(camara.getPref()->getX(), camara.getPref()->getY()+0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_verde3);
+Esfera e18_4(Punto(camara.getPref()->getX()+0.25, camara.getPref()->getY()+0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_verde4);
+Esfera e19_4(Punto(camara.getPref()->getX()+0.5, camara.getPref()->getY()+0.45, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.1, p_verde5);
 
-FuenteLuz f0_4(Punto(camara.getPref()->getX(), camara.getPref()->getY() , camara.getPref()->getZ() -  0.2), 1.5);
-FuenteLuz f1_4(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 2);
+Esfera e20(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+1001), 1000, p_blanco);
+
+FuenteLuz f0_4(Punto(camara.getPref()->getX()-0.5, camara.getPref()->getY() +2, camara.getPref()->getZ() -  5), 4);
+FuenteLuz f1_4(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.5 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 5);
 
 //PROTOTIPOS DE LAS FUNCIONES
 void cargar_escena(int escena);

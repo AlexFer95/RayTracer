@@ -104,6 +104,8 @@ void cargar_escena(int escena){
             lista_esferas[18] = &e18_4;
             lista_esferas[19] = &e19_4;
 
+            lista_esferas[20] = &e20;
+
 
             lista_luces[0] = &f0_4;
             lista_luces[1] = &f1_4;
@@ -418,7 +420,7 @@ int main(int argc, char* argv[]) {
 
      */
     int escena = 4;
-    ANCHO_IMAGEN = 200;
+    ANCHO_IMAGEN = 400;
     //si postRenderizado == 0 los colores que superen 255 seran reducidos a 255
     //si postRenderizado == 1 los colores seran promediados por el color de mayor intensidad
     int postRenderizado = 0;
