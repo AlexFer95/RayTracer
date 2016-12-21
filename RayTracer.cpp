@@ -29,22 +29,9 @@ void cargar_escena(int escena){
             break;
         case 2:
             num_luces = 2;
-            num_esferas = 12;
+            num_esferas = 16;
             lista_esferas[0] = &cv_left2;
-
-            lista_esferas[1] = &tronco1;
-            lista_esferas[2] = &tronco2;
-            lista_esferas[3] = &hojas1;
-            lista_esferas[4] = &hojas2;
-            lista_esferas[5] = &hojas3;
-            lista_esferas[6] = &bola1;
-            lista_esferas[7] = &bola2;
-            lista_esferas[8] = &bola3;
-            lista_esferas[9] = &bola4;
-            lista_esferas[10] = &bola5;
-
-            lista_esferas[11] = &cv_floor2;
-           /* lista_esferas[1] = &cv_right2;
+            lista_esferas[1] = &cv_right2;
             lista_esferas[2] = &cv_floor2;
             lista_esferas[3] = &cv_roof2;
             lista_esferas[4] = &cv_back2;
@@ -57,7 +44,8 @@ void cargar_escena(int escena){
             lista_esferas[11] = &bola2;
             lista_esferas[12] = &bola3;
             lista_esferas[13] = &bola4;
-            lista_esferas[14] = &bola5;*/
+            lista_esferas[14] = &bola5;
+            lista_esferas[15] = &bola6;
             lista_luces[0] = &f0_2;
             lista_luces[1] = &f1_2;
             break;

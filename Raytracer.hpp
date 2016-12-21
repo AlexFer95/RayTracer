@@ -95,21 +95,23 @@ Esfera cv_ref(Punto(camara.getPref()->getX() + 0.25, camara.getPref()->getY() - 
 FuenteLuz f0(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.2 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.3), 1);
 
 //ESCENA 2: christmas tree
-Esfera cv_left2(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 100, p_azul);
-//Esfera cv_right2(Punto(camara.getPref()->getX() + 1002.5, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_azul);
+Esfera cv_left2(Punto(camara.getPref()->getX()-1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_azul);
+Esfera cv_right2(Punto(camara.getPref()->getX() + 1000.5, camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_azul);
 Esfera cv_floor2(Punto(camara.getPref()->getX() , camara.getPref()->getY() - 1000.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_gris);
-//Esfera cv_roof2(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_azul);
-//Esfera cv_back2(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 1005), 1000, p_azul);
+Esfera cv_roof2(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 1000.5, camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.5), 1000, p_azul);
+Esfera cv_back2(Punto(camara.getPref()->getX() , camara.getPref()->getY(), camara.getPref()->getZ() + DISTANCIA_PANTALLA + 1001), 1000, p_azul);
 Esfera tronco1(Punto(camara.getPref()->getX(), camara.getPref()->getY()-0.5, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.1, p_marron);
 Esfera tronco2(Punto(camara.getPref()->getX(), camara.getPref()->getY()-0.4, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.1, p_marron);
 Esfera hojas1(Punto(camara.getPref()->getX(), camara.getPref()->getY()-0.2, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.2, p_verde);
 Esfera hojas2(Punto(camara.getPref()->getX(), camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.1, p_verde);
 Esfera hojas3(Punto(camara.getPref()->getX(), camara.getPref()->getY()+0.1, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.05, p_verde);
-Esfera bola1(Punto(camara.getPref()->getX()-0.1, camara.getPref()->getY()-0.2, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.19), 0.02, p_azul2);
-Esfera bola2(Punto(camara.getPref()->getX()+0.1, camara.getPref()->getY()-0.1, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.25), 0.02, p_rojo2);
-Esfera bola3(Punto(camara.getPref()->getX()+0.05, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.3), 0.02, p_mora2);
-Esfera bola4(Punto(camara.getPref()->getX()-0.05, camara.getPref()->getY()+0.1, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.45), 0.02, p_rojo2);
-Esfera bola5(Punto(camara.getPref()->getX(), camara.getPref()->getY()+0.2, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.07, p_amar2);
+Esfera bola1(Punto(camara.getPref()->getX()-0.1, camara.getPref()->getY()-0.2, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.31), 0.02, p_azul2);
+Esfera bola2(Punto(camara.getPref()->getX()+0.1, camara.getPref()->getY()-0.1, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.35), 0.02, p_rojo2);
+Esfera bola3(Punto(camara.getPref()->getX()+0.05, camara.getPref()->getY(), camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.40), 0.02, p_mora2);
+Esfera bola4(Punto(camara.getPref()->getX()-0.05, camara.getPref()->getY()+0.1, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.45), 0.02, p_rojo4);
+Esfera bola5(Punto(camara.getPref()->getX()-0.075, camara.getPref()->getY()-0.05, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.38), 0.02, p_azul3);
+Esfera bola6(Punto(camara.getPref()->getX(), camara.getPref()->getY()+0.2, camara.getPref()->getZ()+DISTANCIA_PANTALLA+0.5), 0.07, p_amar4);
+
 FuenteLuz f0_2(Punto(camara.getPref()->getX()-0.2, camara.getPref()->getY() - 0.1 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.4), 1.2);
 FuenteLuz f1_2(Punto(camara.getPref()->getX() , camara.getPref()->getY() + 0.2 , camara.getPref()->getZ() + DISTANCIA_PANTALLA + 0.2), 2);
 
